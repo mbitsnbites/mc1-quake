@@ -118,7 +118,7 @@ static char end2[] =
 void Sys_Quit (void)
 {
 	Host_Shutdown();
-    fcntl (0, F_SETFL, fcntl (0, F_GETFL, 0) & ~FNDELAY);
+    fcntl (0, F_SETFL, fcntl (0, F_GETFL, 0) & ~O_NDELAY);
 #if 0
 	if (registered.value)
 		printf("%s", end2);
@@ -142,7 +142,7 @@ void Sys_Error (char *error, ...)
     char        string[1024];
 
 // change stdin to non blocking
-    fcntl (0, F_SETFL, fcntl (0, F_GETFL, 0) & ~FNDELAY);
+    fcntl (0, F_SETFL, fcntl (0, F_GETFL, 0) & ~O_NDELAY);
     
     va_start (argptr,error);
     vsprintf (string,error,argptr);
@@ -281,10 +281,9 @@ void Sys_EditFile(char *filename)
 double Sys_FloatTime (void)
 {
     struct timeval tp;
-    struct timezone tzp; 
     static int      secbase; 
     
-    gettimeofday(&tp, &tzp);  
+    gettimeofday(&tp, NULL);
 
     if (!secbase)
     {
@@ -386,7 +385,7 @@ int main (int c, char **v)
 // caching is disabled by default, use -cachedir to enable
 //	parms.cachedir = cachedir;
 
-	fcntl(0, F_SETFL, fcntl (0, F_GETFL, 0) | FNDELAY);
+	fcntl(0, F_SETFL, fcntl (0, F_GETFL, 0) | O_NDELAY);
 
     Host_Init(&parms);
 
@@ -395,7 +394,7 @@ int main (int c, char **v)
 	if (COM_CheckParm("-nostdout"))
 		nostdout = 1;
 	else {
-		fcntl(0, F_SETFL, fcntl (0, F_GETFL, 0) | FNDELAY);
+		fcntl(0, F_SETFL, fcntl (0, F_GETFL, 0) | O_NDELAY);
 		printf ("Linux Quake -- Version %0.3f\n", LINUX_VERSION);
 	}
 
