@@ -63,6 +63,12 @@ void	VID_Shutdown (void)
 
 void	VID_Update (vrect_t *rects)
 {
+    // Simulate 60 FPS.
+    double t0 = Sys_FloatTime();
+    double dt;
+    do {
+        dt = Sys_FloatTime() - t0;
+    } while (dt < (1.0/60.0));
 }
 
 /*
