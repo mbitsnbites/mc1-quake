@@ -114,7 +114,7 @@ void SCR_EraseCenterString (void)
 	}
 
 	if (scr_center_lines <= 4)
-		y = vid.height*0.35;
+		y = vid.height*0.35f;
 	else
 		y = 48;
 
@@ -140,7 +140,7 @@ void SCR_DrawCenterString (void)
 	start = scr_centerstring;
 
 	if (scr_center_lines <= 4)
-		y = vid.height*0.35;
+		y = vid.height*0.35f;
 	else
 		y = 48;
 
@@ -200,11 +200,11 @@ float CalcFov (float fov_x, float width, float height)
         if (fov_x < 1 || fov_x > 179)
                 Sys_Error ("Bad fov: %f", fov_x);
 
-        x = width/tan(fov_x/360*M_PI);
+		x = width/tanf(fov_x*(M_PI/360.0f));
 
-        a = atan (height/x);
+		a = atanf (height/x);
 
-        a = a*360/M_PI;
+		a = a*(360.0f/M_PI);
 
         return a;
 }
@@ -386,7 +386,7 @@ SCR_DrawNet
 */
 void SCR_DrawNet (void)
 {
-	if (realtime - cl.last_received_message < 0.3)
+	if (((float)realtime - cl.last_received_message) < 0.3f)
 		return;
 	if (cls.demoplayback)
 		return;
@@ -446,10 +446,12 @@ SCR_SetUpToDrawConsole
 void SCR_SetUpToDrawConsole (void)
 {
 	Con_CheckResize ();
-	
+
 	if (scr_drawloading)
 		return;		// never a console with loading plaque
-		
+
+	float _host_frametime = host_frametime;
+
 // decide on the height of the console
 	con_forcedup = !cl.worldmodel || cls.signon != SIGNONS;
 
@@ -465,14 +467,14 @@ void SCR_SetUpToDrawConsole (void)
 	
 	if (scr_conlines < scr_con_current)
 	{
-		scr_con_current -= scr_conspeed.value*host_frametime;
+		scr_con_current -= scr_conspeed.value*_host_frametime;
 		if (scr_conlines > scr_con_current)
 			scr_con_current = scr_conlines;
 
 	}
 	else if (scr_conlines > scr_con_current)
 	{
-		scr_con_current += scr_conspeed.value*host_frametime;
+		scr_con_current += scr_conspeed.value*_host_frametime;
 		if (scr_conlines < scr_con_current)
 			scr_con_current = scr_conlines;
 	}
@@ -712,7 +714,7 @@ void SCR_DrawNotifyString (void)
 
 	start = scr_notifystring;
 
-	y = vid.height*0.35;
+	y = vid.height*0.35f;
 
 	do	
 	{

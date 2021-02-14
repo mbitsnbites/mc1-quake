@@ -135,6 +135,7 @@ void InsertLinkAfter (link_t *l, link_t *after)
 ============================================================================
 */
 
+#ifndef MC1
 void Q_memset (void *dest, int fill, int count)
 {
 	int             i;
@@ -165,6 +166,7 @@ void Q_memcpy (void *dest, void *src, int count)
 		for (i=0 ; i<count ; i++)
 			((byte *)dest)[i] = ((byte *)src)[i];
 }
+#endif  // MC1
 
 int Q_memcmp (void *m1, void *m2, int count)
 {
@@ -350,7 +352,7 @@ int Q_atoi (char *str)
 
 float Q_atof (char *str)
 {
-	double			val;
+	float			val;
 	int             sign;
 	int             c;
 	int             decimal, total;
@@ -716,12 +718,12 @@ char *MSG_ReadString (void)
 
 float MSG_ReadCoord (void)
 {
-	return MSG_ReadShort() * (1.0/8);
+	return MSG_ReadShort() * (1.0f/8);
 }
 
 float MSG_ReadAngle (void)
 {
-	return MSG_ReadChar() * (360.0/256);
+	return MSG_ReadChar() * (360.0f/256);
 }
 
 
