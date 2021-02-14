@@ -80,7 +80,7 @@ if(MC1)
        net_none.c
        snd_null.c
        sys_mc1.c
-       vid_null.c
+       vid_mc1.c
   )
 elseif(UNIX)
   list(APPEND SRCS
