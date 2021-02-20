@@ -2,7 +2,7 @@
 
 cmake_minimum_required(VERSION 3.10)
 
-project(mc1-quake)
+project(mc1-quake LANGUAGES C CXX ASM)
 
 set(SRCS
     chase.c
@@ -81,6 +81,7 @@ if(MC1)
        snd_null.c
        sys_mc1.c
        vid_mc1.c
+       r_surf_mr32.s
   )
 elseif(UNIX)
   list(APPEND SRCS

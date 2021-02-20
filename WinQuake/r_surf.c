@@ -335,6 +335,7 @@ void R_DrawSurface (void)
 
 #if	!id386
 
+#if !defined(__MRISC32_VECTOR_OPS__)
 /*
 ================
 R_DrawSurfaceBlock8_mip0
@@ -342,7 +343,7 @@ R_DrawSurfaceBlock8_mip0
 */
 void R_DrawSurfaceBlock8_mip0 (void)
 {
-	int				v, i, b, lightstep, lighttemp, light;
+	int				v;
 	unsigned char	pix, *psource, *prowdest;
 
 	unsigned _lightleft, _lightright, _lightleftstep, _lightrightstep;
@@ -366,20 +367,20 @@ void R_DrawSurfaceBlock8_mip0 (void)
 		_lightleftstep = (_r_lightptr[0] - _lightleft) >> 4;
 		_lightrightstep = (_r_lightptr[1] - _lightright) >> 4;
 
+		int	i;
 		for (i=0 ; i<16 ; i++)
 		{
-			lighttemp = _lightleft - _lightright;
-			lightstep = lighttemp >> 4;
+			int light = _lightright;
+			int lightstep = (_lightleft - _lightright) >> 4;
+			int b;
 
-			light = _lightright;
-
-			for (b=15; b>=0; b--)
+			for (b = 15; b >= 0; b--)
 			{
 				pix = psource[b];
 				prowdest[b] = cmap[(light & 0xFF00) + pix];
 				light += lightstep;
 			}
-	
+
 			psource += _sourcetstep;
 			_lightright += _lightrightstep;
 			_lightleft += _lightleftstep;
@@ -393,7 +394,6 @@ void R_DrawSurfaceBlock8_mip0 (void)
 	r_lightptr = _r_lightptr;
 }
 
-
 /*
 ================
 R_DrawSurfaceBlock8_mip1
@@ -401,7 +401,7 @@ R_DrawSurfaceBlock8_mip1
 */
 void R_DrawSurfaceBlock8_mip1 (void)
 {
-	int				v, i, b, lightstep, lighttemp, light;
+	int				v, i, b, lightstep, light;
 	unsigned char	pix, *psource, *prowdest;
 
 	unsigned _lightleft, _lightright, _lightleftstep, _lightrightstep;
@@ -427,10 +427,8 @@ void R_DrawSurfaceBlock8_mip1 (void)
 
 		for (i=0 ; i<8 ; i++)
 		{
-			lighttemp = _lightleft - _lightright;
-			lightstep = lighttemp >> 3;
-
 			light = _lightright;
+			lightstep = (_lightleft - _lightright) >> 3;
 
 			for (b=7; b>=0; b--)
 			{
@@ -460,7 +458,7 @@ R_DrawSurfaceBlock8_mip2
 */
 void R_DrawSurfaceBlock8_mip2 (void)
 {
-	int				v, i, b, lightstep, lighttemp, light;
+	int				v, i, b, lightstep, light;
 	unsigned char	pix, *psource, *prowdest;
 
 	unsigned _lightleft, _lightright, _lightleftstep, _lightrightstep;
@@ -486,10 +484,8 @@ void R_DrawSurfaceBlock8_mip2 (void)
 
 		for (i=0 ; i<4 ; i++)
 		{
-			lighttemp = _lightleft - _lightright;
-			lightstep = lighttemp >> 2;
-
 			light = _lightright;
+			lightstep = (_lightleft - _lightright) >> 2;
 
 			for (b=3; b>=0; b--)
 			{
@@ -519,7 +515,7 @@ R_DrawSurfaceBlock8_mip3
 */
 void R_DrawSurfaceBlock8_mip3 (void)
 {
-	int				v, i, b, lightstep, lighttemp, light;
+	int				v, i, b, lightstep, light;
 	unsigned char	pix, *psource, *prowdest;
 
 	unsigned _lightleft, _lightright, _lightleftstep, _lightrightstep;
@@ -545,10 +541,8 @@ void R_DrawSurfaceBlock8_mip3 (void)
 
 		for (i=0 ; i<2 ; i++)
 		{
-			lighttemp = _lightleft - _lightright;
-			lightstep = lighttemp >> 1;
-
 			light = _lightright;
+			lightstep = (_lightleft - _lightright) >> 1;
 
 			for (b=1; b>=0; b--)
 			{
@@ -569,6 +563,8 @@ void R_DrawSurfaceBlock8_mip3 (void)
 
 	r_lightptr = _r_lightptr;
 }
+
+#endif  // !__MRISC32_VECTOR_OPS__
 
 
 /*
@@ -618,7 +614,7 @@ void R_DrawSurfaceBlock16 (void)
 	prowdestbase = prowdest;
 }
 
-#endif
+#endif  // !id386
 
 
 //============================================================================
