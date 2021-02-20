@@ -474,6 +474,26 @@ void D_DrawZSpans (espan_t *pspan)
 
 		if ((doublecount = count >> 1) > 0)
 		{
+#if defined(__MRISC32__)
+			unsigned mask = 0xffff0000;
+			__asm__ volatile(
+				"1:\n"
+				"    lsr     %[ltemp], %[izi], #16\n"
+				"    add     %[izi], %[izi], %[izistep]\n"
+				"    sel.231 %[ltemp], %[mask], %[izi]\n"
+				"    add     %[izi], %[izi], %[izistep]\n"
+				"    stw     %[ltemp], %[pdest], #0\n"
+				"    add     %[pdest], %[pdest], #4\n"
+				"    add     %[doublecount], %[doublecount], #-1\n"
+				"    bnz     %[doublecount], 1b\n"
+				: [pdest] "+r"(pdest),
+				  [izi] "+r"(izi),
+				  [ltemp] "=&r"(ltemp)
+				: [izistep] "r"(izistep),
+				  [doublecount] "r"(doublecount),
+				  [mask] "r"(mask)
+				);
+#else
 			do
 			{
 				ltemp = izi >> 16;
@@ -483,6 +503,7 @@ void D_DrawZSpans (espan_t *pspan)
 				*(int *)pdest = ltemp;
 				pdest += 2;
 			} while (--doublecount > 0);
+#endif
 		}
 
 		if (count & 1)
