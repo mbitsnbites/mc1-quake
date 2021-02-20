@@ -1,5 +1,6 @@
 /*
 Copyright (C) 1996-1997 Id Software, Inc.
+Copyright (C) 2021 Marcus Geelnard
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -8,7 +9,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -22,6 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "quakedef.h"
 #include "errno.h"
 
+#include <stdint.h>
 #include <sys/time.h>
 
 //----------------------------------------------------------------------------
@@ -42,12 +44,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define VIDY        36
 #define SWITCHES    40
 #define BUTTONS     44
-#define KEYCODE     48
+#define KEYPTR      48
 #define MOUSEPOS    52
 #define MOUSEBTNS   56
 // clang-format on
 
-#define GET_MMIO(reg) (*(volatile unsigned*)(&((volatile byte*)0xc0000000)[reg]))
+#define GET_MMIO(reg) \
+	(*(volatile unsigned *)(&((volatile byte *)0xc0000000)[reg]))
+#define GET_KEYBUF(ptr) \
+	((volatile unsigned *)(((volatile byte *)0xc0000080)))[ptr]
+#define KEYBUF_SIZE 16
 
 // MC1 keyboard scancodes.
 // clang-format off
@@ -171,15 +177,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // End MC1 definitions
 //----------------------------------------------------------------------------
 
-
-qboolean                    isDedicated;
-
+qboolean isDedicated;
 
 static int Sys_TranslateKey (unsigned keycode)
 {
-    // clang-format off
+	// clang-format off
     switch (keycode)
     {
+        case KB_SPACE:         return K_SPACE;
         case KB_LEFT:          return K_LEFTARROW;
         case KB_RIGHT:         return K_RIGHTARROW;
         case KB_DOWN:          return K_DOWNARROW;
@@ -255,30 +260,33 @@ static int Sys_TranslateKey (unsigned keycode)
         default:
             return 0;
     }
-    // clang-format on
+	// clang-format on
 }
+
+static unsigned s_keyptr;
 
 static qboolean Sys_PollKeyEvent (void)
 {
-    static unsigned s_old_keycode;
+	unsigned keyptr, keycode;
+	int quake_key;
 
-    // Do we have a new key event?
-    unsigned keycode = GET_MMIO(KEYCODE);
-    if (keycode == s_old_keycode)
-        return false;
-    s_old_keycode = keycode;
+	// Check if we have any new keycode from the keyboard.
+	keyptr = GET_MMIO (KEYPTR);
+	if (s_keyptr == keyptr)
+		return false;
 
-    // Translate the MC1 keycode to a Quake keycode.
-    int quake_key = Sys_TranslateKey ((keycode >> 16) & 0x1ff);
-    if (quake_key == 0)
-        return false;
+	// Get the next keycode.
+	++s_keyptr;
+	keycode = GET_KEYBUF (s_keyptr % KEYBUF_SIZE);
 
-    // Create a Quake keyboard event.
-    Key_Event (quake_key, (keycode & 0x80000000) ? true : false);
-    return true;
+	// Translate the MC1 keycode to a Quake keycode.
+	quake_key = Sys_TranslateKey (keycode & 0x1ff);
+	if (quake_key != 0)
+	{
+		Key_Event (quake_key, (keycode & 0x80000000) ? true : false);
+	}
+	return true;
 }
-
-
 
 /*
 ===============================================================================
@@ -288,14 +296,14 @@ FILE IO
 ===============================================================================
 */
 
-#define MAX_HANDLES             10
-FILE    *sys_handles[MAX_HANDLES];
+#define MAX_HANDLES 10
+FILE *sys_handles[MAX_HANDLES];
 
-int             findhandle (void)
+int findhandle (void)
 {
-	int             i;
-	
-	for (i=1 ; i<MAX_HANDLES ; i++)
+	int i;
+
+	for (i = 1; i < MAX_HANDLES; i++)
 		if (!sys_handles[i])
 			return i;
 	Sys_Error ("out of handles");
@@ -309,8 +317,8 @@ filelength
 */
 int filelength (FILE *f)
 {
-	int             pos;
-	int             end;
+	int pos;
+	int end;
 
 	pos = ftell (f);
 	fseek (f, 0, SEEK_END);
@@ -322,12 +330,12 @@ int filelength (FILE *f)
 
 int Sys_FileOpenRead (char *path, int *hndl)
 {
-	FILE    *f;
-	int             i;
-	
+	FILE *f;
+	int i;
+
 	i = findhandle ();
 
-	f = fopen(path, "rb");
+	f = fopen (path, "rb");
 	if (!f)
 	{
 		*hndl = -1;
@@ -335,22 +343,22 @@ int Sys_FileOpenRead (char *path, int *hndl)
 	}
 	sys_handles[i] = f;
 	*hndl = i;
-	
-	return filelength(f);
+
+	return filelength (f);
 }
 
 int Sys_FileOpenWrite (char *path)
 {
-	FILE    *f;
-	int             i;
-	
+	FILE *f;
+	int i;
+
 	i = findhandle ();
 
-	f = fopen(path, "wb");
+	f = fopen (path, "wb");
 	if (!f)
-		Sys_Error ("Error opening %s: %s", path,strerror(errno));
+		Sys_Error ("Error opening %s: %s", path, strerror (errno));
 	sys_handles[i] = f;
-	
+
 	return i;
 }
 
@@ -375,24 +383,23 @@ int Sys_FileWrite (int handle, void *data, int count)
 	return fwrite (data, 1, count, sys_handles[handle]);
 }
 
-int     Sys_FileTime (char *path)
+int Sys_FileTime (char *path)
 {
-	FILE    *f;
-	
-	f = fopen(path, "rb");
+	FILE *f;
+
+	f = fopen (path, "rb");
 	if (f)
 	{
-		fclose(f);
+		fclose (f);
 		return 1;
 	}
-	
+
 	return -1;
 }
 
 void Sys_mkdir (char *path)
 {
 }
-
 
 /*
 ===============================================================================
@@ -406,14 +413,13 @@ void Sys_MakeCodeWriteable (unsigned long startaddr, unsigned long length)
 {
 }
 
-
 void Sys_Error (char *error, ...)
 {
-	va_list         argptr;
+	va_list argptr;
 
-	printf ("Sys_Error: ");   
-	va_start (argptr,error);
-	vprintf (error,argptr);
+	printf ("Sys_Error: ");
+	va_start (argptr, error);
+	vprintf (error, argptr);
 	va_end (argptr);
 	printf ("\n");
 
@@ -422,10 +428,10 @@ void Sys_Error (char *error, ...)
 
 void Sys_Printf (char *fmt, ...)
 {
-	va_list         argptr;
-	
-	va_start (argptr,fmt);
-	vprintf (fmt,argptr);
+	va_list argptr;
+
+	va_start (argptr, fmt);
+	vprintf (fmt, argptr);
 	va_end (argptr);
 }
 
@@ -436,17 +442,47 @@ void Sys_Quit (void)
 
 double Sys_FloatTime (void)
 {
-    static qboolean first = true;
-    static struct timeval t0;
-    struct timeval t;
+#if 1
+	// MRISC32 simulator timing: Use gettimeofday().
+	static qboolean s_first = true;
+	static struct timeval s_t0;
+	struct timeval t;
 
-    if (first)
-    {
-        gettimeofday (&t0, NULL);
-        first = false;
-    }
-    gettimeofday (&t, NULL);
-    return (double)(t.tv_sec - t0.tv_sec) + 0.000001 * (double)(t.tv_usec - t0.tv_usec);
+	if (s_first)
+	{
+		gettimeofday (&s_t0, NULL);
+		s_first = false;
+	}
+	gettimeofday (&t, NULL);
+	return (double)(t.tv_sec - s_t0.tv_sec) +
+		   0.000001 * (double)(t.tv_usec - s_t0.tv_usec);
+#else
+	// MC1 timing: Use CLKCNTHI:CLKCNTLO MMIO registers directly.
+	static qboolean s_first = true;
+	static double s_inv_clk;
+	uint32_t hi_old, hi, lo;
+	uint64_t cycles;
+	double t;
+
+	// Get 1 / cycles per s.
+	if (s_first)
+	{
+		s_inv_clk = 1.0 / (double)GET_MMIO (CPUCLK);
+		s_first = false;
+	}
+
+	// Get number of CPU cycles (64-bit number).
+	hi = GET_MMIO (CLKCNTHI);
+	do
+	{
+		hi_old = hi;
+		lo = GET_MMIO (CLKCNTLO);
+		hi = GET_MMIO (CLKCNTHI);
+	} while (hi != hi_old);
+
+	cycles = (((uint64_t)hi) << 32) | (uint64_t)lo;
+	return s_inv_clk * (double)cycles;
+#endif
 }
 
 char *Sys_ConsoleInput (void)
@@ -460,7 +496,8 @@ void Sys_Sleep (void)
 
 void Sys_SendKeyEvents (void)
 {
-    while (Sys_PollKeyEvent ());
+	while (Sys_PollKeyEvent ())
+		;
 }
 
 void Sys_HighFPPrecision (void)
@@ -475,9 +512,10 @@ void Sys_LowFPPrecision (void)
 
 void main (int argc, char **argv)
 {
-	static quakeparms_t    parms;
+	static quakeparms_t parms;
+	double oldtime, newtime, time;
 
-	parms.memsize = 8*1024*1024;
+	parms.memsize = 8 * 1024 * 1024;
 	parms.membase = malloc (parms.memsize);
 	parms.basedir = ".";
 
@@ -488,10 +526,25 @@ void main (int argc, char **argv)
 
 	printf ("Host_Init\n");
 	Host_Init (&parms);
+
+	s_keyptr = GET_MMIO (KEYPTR);
 	while (1)
 	{
 		Host_Frame (0.1);
 	}
+
+	oldtime = Sys_FloatTime () - 0.1;
+	while (1)
+	{
+		// find time spent rendering last frame
+		newtime = Sys_FloatTime ();
+		time = newtime - oldtime;
+
+		if (time > sys_ticrate.value * 2)
+			oldtime = newtime;
+		else
+			oldtime += time;
+
+		Host_Frame (time);
+	}
 }
-
-
