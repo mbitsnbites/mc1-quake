@@ -87,7 +87,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
         ldub    v1, s7, v1          ; v1 = vid.colormap[(v2 & 0xff00) | v1]
         stb     v1, s9, #1          ; prowdestbase[b] = v1
         ldea    s8, s8, s1          ; pbasesource += sourcetstep
-        add		s11, s11, s13       ; lightleft += lightleftstep
+        add     s11, s11, s13       ; lightleft += lightleftstep
         add     s12, s12, s14       ; lightright += lightrightstep
         ldea    s9, s9, s2          ; prowdestbase += surfrowbytes
     .endr
@@ -118,7 +118,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 ; void R_DrawSurfaceBlock8_mip0 (void)
 ;-----------------------------------------------------------------------------
 
-    .p2align    2
+    .p2align    5
     .global     R_DrawSurfaceBlock8_mip0
     .type       R_DrawSurfaceBlock8_mip0, @function
 
@@ -132,7 +132,7 @@ R_DrawSurfaceBlock8_mip0:
 ; void R_DrawSurfaceBlock8_mip1 (void)
 ;-----------------------------------------------------------------------------
 
-    .p2align    2
+    .p2align    5
     .global     R_DrawSurfaceBlock8_mip1
     .type       R_DrawSurfaceBlock8_mip1, @function
 
@@ -146,7 +146,7 @@ R_DrawSurfaceBlock8_mip1:
 ; void R_DrawSurfaceBlock8_mip2 (void)
 ;-----------------------------------------------------------------------------
 
-    .p2align    2
+    .p2align    5
     .global     R_DrawSurfaceBlock8_mip2
     .type       R_DrawSurfaceBlock8_mip2, @function
 
@@ -160,7 +160,7 @@ R_DrawSurfaceBlock8_mip2:
 ; void R_DrawSurfaceBlock8_mip3 (void)
 ;-----------------------------------------------------------------------------
 
-    .p2align    2
+    .p2align    5
     .global     R_DrawSurfaceBlock8_mip3
     .type       R_DrawSurfaceBlock8_mip3, @function
 
