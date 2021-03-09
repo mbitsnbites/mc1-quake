@@ -19,6 +19,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
+#ifdef __MRISC32_VECTOR_OPS__
+
 ; r_surf_mr32.s
 ; MRISC32 assembler implementations of surface block drawing.
 
@@ -168,4 +170,6 @@ R_DrawSurfaceBlock8_mip3:
     R_DrawSurfaceBlock8 2, 1
 
     .size   R_DrawSurfaceBlock8_mip3, .-R_DrawSurfaceBlock8_mip3
+
+#endif  /* __MRISC32_VECTOR_OPS__ */
 

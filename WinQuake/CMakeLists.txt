@@ -73,7 +73,6 @@ if(MC1)
   list(APPEND DEFS -DMC1)
   list(APPEND LIBS
        m
-       -msim
   )
   list(APPEND SRCS
        in_null.c
@@ -153,7 +152,7 @@ set_property(TARGET mc1quake PROPERTY C_EXTENSIONS OFF)
 if(MC1)
   add_custom_command(OUTPUT mc1quake.bin
                      DEPENDS mc1quake
-                     COMMAND mrisc32-elf-objcopy ARGS -O binary mc1quake mc1quake.bin
+                     COMMAND ${CMAKE_OBJCOPY} ARGS -O binary mc1quake mc1quake.bin
                      COMMENT "Generate raw binary")
   add_custom_target(mc1quake_raw ALL
                     DEPENDS mc1quake.bin)
