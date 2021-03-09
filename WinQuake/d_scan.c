@@ -247,7 +247,7 @@ void Turbulent8 (espan_t *pspan)
 }
 
 
-#if	!id386
+#if	!id386 && !defined(__MRISC32_HARD_FLOAT__)
 
 /*
 =============
@@ -383,36 +383,12 @@ void D_DrawSpans8 (espan_t *pspan)
 				}
 			}
 
-#if defined(__MRISC32_VECTOR_OPS__)
-			// This vectorized routine takes <9 clock-cycles per pixel.
-			__asm__ volatile(
-				"    mov     vl, %[spancount]\n"  // spancount <= 8, so no need for cpuid
-				"    ldea    v1, %[s], %[sstep]\n"
-				"    ldea    v2, %[t], %[tstep]\n"
-				"    lsr     v1, v1, #16\n"
-				"    lsr     v2, v2, #16\n"
-				"    mul     v2, v2, %[_cachewidth]\n"
-				"    add     v1, v1, v2\n"
-				"    ldub    v1, %[pbase], v1\n"
-				"    stb     v1, %[pdest], #1\n"
-				"    ldea    %[pdest], %[pdest], vl\n"
-				: [pdest] "+r"(pdest)
-				: [pbase] "r"(pbase),
-				  [s] "r"(s),
-				  [t] "r"(t),
-				  [_cachewidth] "r"(_cachewidth),
-				  [sstep] "r"(sstep),
-				  [tstep] "r"(tstep),
-				  [spancount] "r"(spancount)
-				);
-#else
 			do
 			{
 				*pdest++ = pbase[(s >> 16) + (t >> 16) * _cachewidth];
 				s += sstep;
 				t += tstep;
 			} while (--spancount > 0);
-#endif
 
 			s = snext;
 			t = tnext;
