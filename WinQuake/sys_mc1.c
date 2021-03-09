@@ -528,11 +528,6 @@ void main (int argc, char **argv)
 	Host_Init (&parms);
 
 	s_keyptr = GET_MMIO (KEYPTR);
-	while (1)
-	{
-		Host_Frame (0.1);
-	}
-
 	oldtime = Sys_FloatTime () - 0.1;
 	while (1)
 	{
