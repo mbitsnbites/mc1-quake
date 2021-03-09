@@ -81,6 +81,7 @@ if(MC1)
        snd_null.c
        sys_mc1.c
        vid_mc1.c
+       d_scan_mr32.s
        r_surf_mr32.s
   )
 elseif(UNIX)

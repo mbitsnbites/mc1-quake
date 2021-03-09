@@ -25,10 +25,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "r_local.h"
 #include "d_local.h"
 
-#ifdef __MRISC32__
-#include <mr32intrin.h>
-#endif
-
 unsigned char	*r_turb_pbase, *r_turb_pdest;
 fixed16_t		r_turb_s, r_turb_t, r_turb_sstep, r_turb_tstep;
 int				*r_turb_turb;
@@ -429,7 +425,7 @@ void D_DrawSpans8 (espan_t *pspan)
 #endif
 
 
-#if	!id386
+#if	!id386 && !defined(__MRISC32_HARD_FLOAT__)
 
 /*
 =============
@@ -445,13 +441,9 @@ void D_DrawZSpans (espan_t *pspan)
 	float			zi;
 	float			du, dv;
 
-#ifdef __MRISC32_HARD_FLOAT__
-	izistep = _mr32_ftoi(d_zistepu, 31);
-#else
 // FIXME: check for clamping/range problems
 // we count on FP exceptions being turned off to avoid range problems
 	izistep = (int)(d_zistepu * 0x8000 * 0x10000);
-#endif
 
 	short *_d_pzbuffer = d_pzbuffer;
 	unsigned int _d_zwidth= d_zwidth;
@@ -470,12 +462,8 @@ void D_DrawZSpans (espan_t *pspan)
 		dv = (float)pspan->v;
 
 		zi = _d_ziorigin + dv*_d_zistepv + du*_d_zistepu;
-#ifdef __MRISC32_HARD_FLOAT__
-		izi = _mr32_ftoi(zi, 31);
-#else
 	// we count on FP exceptions being turned off to avoid range problems
 		izi = (int)(zi * 0x8000 * 0x10000);
-#endif
 
 
 		if ((long)pdest & 0x02)
@@ -489,15 +477,9 @@ void D_DrawZSpans (espan_t *pspan)
 		{
 			do
 			{
-#if defined(__MRISC32_PACKED_OPS__)
-				ltemp = izi;
-				izi += izistep;
-				ltemp = _mr32_packhi(izi, ltemp);
-#else
 				ltemp = izi >> 16;
 				izi += izistep;
 				ltemp |= izi & 0xFFFF0000;
-#endif
 				izi += izistep;
 				*(int *)pdest = ltemp;
 				pdest += 2;
