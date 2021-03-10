@@ -75,7 +75,7 @@ if(MC1)
        m
   )
   list(APPEND SRCS
-       in_null.c
+       in_mc1.c
        net_none.c
        snd_null.c
        sys_mc1.c
