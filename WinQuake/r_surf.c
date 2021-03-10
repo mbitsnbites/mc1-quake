@@ -77,7 +77,7 @@ void R_AddDynamicLights (void)
 
 	for (lnum=0 ; lnum<MAX_DLIGHTS ; lnum++)
 	{
-		if ( !(surf->dlightbits & (1<<lnum) ) )
+		if ( !(surf->dlightbits & (1U<<lnum) ) )
 			continue;		// not lit by this light
 
 		rad = cl_dlights[lnum].radius;
@@ -370,8 +370,8 @@ void R_DrawSurfaceBlock8_mip0 (void)
 		int	i;
 		for (i=0 ; i<16 ; i++)
 		{
-			int light = _lightright;
-			int lightstep = (_lightleft - _lightright) >> 4;
+			unsigned light = _lightright;
+			unsigned lightstep = (_lightleft - _lightright) >> 4;
 			int b;
 
 			for (b = 15; b >= 0; b--)
@@ -401,7 +401,7 @@ R_DrawSurfaceBlock8_mip1
 */
 void R_DrawSurfaceBlock8_mip1 (void)
 {
-	int				v, i, b, lightstep, light;
+	int				v, i, b;
 	unsigned char	pix, *psource, *prowdest;
 
 	unsigned _lightleft, _lightright, _lightleftstep, _lightrightstep;
@@ -427,8 +427,8 @@ void R_DrawSurfaceBlock8_mip1 (void)
 
 		for (i=0 ; i<8 ; i++)
 		{
-			light = _lightright;
-			lightstep = (_lightleft - _lightright) >> 3;
+			unsigned light = _lightright;
+			unsigned lightstep = (_lightleft - _lightright) >> 3;
 
 			for (b=7; b>=0; b--)
 			{
@@ -458,7 +458,7 @@ R_DrawSurfaceBlock8_mip2
 */
 void R_DrawSurfaceBlock8_mip2 (void)
 {
-	int				v, i, b, lightstep, light;
+	int				v, i, b;
 	unsigned char	pix, *psource, *prowdest;
 
 	unsigned _lightleft, _lightright, _lightleftstep, _lightrightstep;
@@ -484,8 +484,8 @@ void R_DrawSurfaceBlock8_mip2 (void)
 
 		for (i=0 ; i<4 ; i++)
 		{
-			light = _lightright;
-			lightstep = (_lightleft - _lightright) >> 2;
+			unsigned light = _lightright;
+			unsigned lightstep = (_lightleft - _lightright) >> 2;
 
 			for (b=3; b>=0; b--)
 			{
@@ -515,7 +515,7 @@ R_DrawSurfaceBlock8_mip3
 */
 void R_DrawSurfaceBlock8_mip3 (void)
 {
-	int				v, i, b, lightstep, light;
+	int				v, i, b;
 	unsigned char	pix, *psource, *prowdest;
 
 	unsigned _lightleft, _lightright, _lightleftstep, _lightrightstep;
@@ -541,8 +541,8 @@ void R_DrawSurfaceBlock8_mip3 (void)
 
 		for (i=0 ; i<2 ; i++)
 		{
-			light = _lightright;
-			lightstep = (_lightleft - _lightright) >> 1;
+			unsigned light = _lightright;
+			unsigned lightstep = (_lightleft - _lightright) >> 1;
 
 			for (b=1; b>=0; b--)
 			{
