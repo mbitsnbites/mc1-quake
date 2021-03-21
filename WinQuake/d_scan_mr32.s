@@ -41,20 +41,21 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 D_DrawSpans8:
     ; Store callee saved registers on the stack.
     ; Also allocate space on the stack for local variables (register spill).
-    add     sp, sp, #-64
+    add     sp, sp, #-68
     stw     lr, sp, #12
-    stw     tp, sp, #16
-    stw     fp, sp, #20
-    stw     s25, sp, #24
-    stw     s24, sp, #28
-    stw     s23, sp, #32
-    stw     s22, sp, #36
-    stw     s21, sp, #40
-    stw     s20, sp, #44
-    stw     s19, sp, #48
-    stw     s18, sp, #52
-    stw     s17, sp, #56
-    stw     s16, sp, #60
+    stw     fp, sp, #16
+    stw     tp, sp, #20
+    stw     s26, sp, #24
+    stw     s25, sp, #28
+    stw     s24, sp, #32
+    stw     s23, sp, #36
+    stw     s22, sp, #40
+    stw     s21, sp, #44
+    stw     s20, sp, #48
+    stw     s19, sp, #52
+    stw     s18, sp, #56
+    stw     s17, sp, #60
+    stw     s16, sp, #64
 
     ; Load hot global variables into registers.
     addpchi s2, #cacheblock@pchi
@@ -79,6 +80,8 @@ D_DrawSpans8:
     ldw     s11, s11, #bbextentt+4@pclo     ; s11 = bbextentt (fixed16_t)
     addpchi s12, #cachewidth@pchi
     ldw     s12, s12, #cachewidth+4@pclo    ; s12 = cachewidth (int)
+    addpchi s26, #d_sdivzstepv@pchi
+    ldw     s26, s26, #d_sdivzstepv+4@pclo  ; s26 = d_sdivzstepv (float)
 
     ; Pre-calculate 8.0 * x (and store on the stack since we're out of regs).
     ldi     lr, #0x41000000             ; 8.0
@@ -110,10 +113,8 @@ D_DrawSpans8:
     ; tdivz = d_tdivzorigin + dv*d_tdivzstepv + du*d_tdivzstepu
     ; zi = d_ziorigin + dv*d_zistepv + du*d_zistepu
     ; NOTE: Schedule instructions to avoid stalls.
-    addpchi lr, #d_sdivzstepv@pchi
-    ldw     lr, lr, #d_sdivzstepv+4@pclo
     fmul    s20, s14, s5
-    fmul    s17, s13, lr
+    fmul    s17, s13, s26
     addpchi lr, #d_tdivzstepv@pchi
     ldw     lr, lr, #d_tdivzstepv+4@pclo
     fmul    s21, s14, s6
@@ -215,19 +216,20 @@ D_DrawSpans8:
 
     ; Restore callee saved registers from the stack.
     ldw     lr, sp, #12
-    ldw     tp, sp, #16
-    ldw     fp, sp, #20
-    ldw     s25, sp, #24
-    ldw     s24, sp, #28
-    ldw     s23, sp, #32
-    ldw     s22, sp, #36
-    ldw     s21, sp, #40
-    ldw     s20, sp, #44
-    ldw     s19, sp, #48
-    ldw     s18, sp, #52
-    ldw     s17, sp, #56
-    ldw     s16, sp, #60
-    add     sp, sp, #64
+    ldw     fp, sp, #16
+    ldw     tp, sp, #20
+    ldw     s26, sp, #24
+    ldw     s25, sp, #28
+    ldw     s24, sp, #32
+    ldw     s23, sp, #36
+    ldw     s22, sp, #40
+    ldw     s21, sp, #44
+    ldw     s20, sp, #48
+    ldw     s19, sp, #52
+    ldw     s18, sp, #56
+    ldw     s17, sp, #60
+    ldw     s16, sp, #64
+    add     sp, sp, #68
     ret
 
 3:
