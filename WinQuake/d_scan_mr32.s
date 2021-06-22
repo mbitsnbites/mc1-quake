@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 ;-----------------------------------------------------------------------------
 ; void D_DrawSpans8 (espan_t *pspan)
 ;
-; s1 = pspan
+; r1 = pspan
 ;-----------------------------------------------------------------------------
 
 #ifdef __MRISC32_HARD_FLOAT__
@@ -45,52 +45,52 @@ D_DrawSpans8:
     stw     lr, sp, #12
     stw     fp, sp, #16
     stw     tp, sp, #20
-    stw     s26, sp, #24
-    stw     s25, sp, #28
-    stw     s24, sp, #32
-    stw     s23, sp, #36
-    stw     s22, sp, #40
-    stw     s21, sp, #44
-    stw     s20, sp, #48
-    stw     s19, sp, #52
-    stw     s18, sp, #56
-    stw     s17, sp, #60
-    stw     s16, sp, #64
+    stw     r26, sp, #24
+    stw     r25, sp, #28
+    stw     r24, sp, #32
+    stw     r23, sp, #36
+    stw     r22, sp, #40
+    stw     r21, sp, #44
+    stw     r20, sp, #48
+    stw     r19, sp, #52
+    stw     r18, sp, #56
+    stw     r17, sp, #60
+    stw     r16, sp, #64
 
     ; Load hot global variables into registers.
-    addpchi s2, #cacheblock@pchi
-    ldw     s2, s2, #cacheblock+4@pclo      ; s2 = pbase (unsigned char *)
-    addpchi s3, #d_viewbuffer@pchi
-    ldw     s3, s3, #d_viewbuffer+4@pclo    ; s3 = d_viewbuffer (byte *)
-    addpchi s4, #screenwidth@pchi
-    ldw     s4, s4, #screenwidth+4@pclo     ; s4 = screenwidth (int)
-    addpchi s5, #d_sdivzstepu@pchi
-    ldw     s5, s5, #d_sdivzstepu+4@pclo    ; s5 = d_sdivzstepu (float)
-    addpchi s6, #d_tdivzstepu@pchi
-    ldw     s6, s6, #d_tdivzstepu+4@pclo    ; s6 = d_tdivzstepu (float)
-    addpchi s7, #d_zistepu@pchi
-    ldw     s7, s7, #d_zistepu+4@pclo       ; s7 = d_zistepu (float)
-    addpchi s8, #sadjust@pchi
-    ldw     s8, s8, #sadjust+4@pclo         ; s8 = sadjust (fixed16_t)
-    addpchi s9, #tadjust@pchi
-    ldw     s9, s9, #tadjust+4@pclo         ; s9 = tadjust (fixed16_t)
-    addpchi s10, #bbextents@pchi
-    ldw     s10, s10, #bbextents+4@pclo     ; s10 = bbextents (fixed16_t)
-    addpchi s11, #bbextentt@pchi
-    ldw     s11, s11, #bbextentt+4@pclo     ; s11 = bbextentt (fixed16_t)
-    addpchi s12, #cachewidth@pchi
-    ldw     s12, s12, #cachewidth+4@pclo    ; s12 = cachewidth (int)
-    addpchi s26, #d_sdivzstepv@pchi
-    ldw     s26, s26, #d_sdivzstepv+4@pclo  ; s26 = d_sdivzstepv (float)
+    addpchi r2, #cacheblock@pchi
+    ldw     r2, r2, #cacheblock+4@pclo      ; r2 = pbase (unsigned char *)
+    addpchi r3, #d_viewbuffer@pchi
+    ldw     r3, r3, #d_viewbuffer+4@pclo    ; r3 = d_viewbuffer (byte *)
+    addpchi r4, #screenwidth@pchi
+    ldw     r4, r4, #screenwidth+4@pclo     ; r4 = screenwidth (int)
+    addpchi r5, #d_sdivzstepu@pchi
+    ldw     r5, r5, #d_sdivzstepu+4@pclo    ; r5 = d_sdivzstepu (float)
+    addpchi r6, #d_tdivzstepu@pchi
+    ldw     r6, r6, #d_tdivzstepu+4@pclo    ; r6 = d_tdivzstepu (float)
+    addpchi r7, #d_zistepu@pchi
+    ldw     r7, r7, #d_zistepu+4@pclo       ; r7 = d_zistepu (float)
+    addpchi r8, #sadjust@pchi
+    ldw     r8, r8, #sadjust+4@pclo         ; r8 = sadjust (fixed16_t)
+    addpchi r9, #tadjust@pchi
+    ldw     r9, r9, #tadjust+4@pclo         ; r9 = tadjust (fixed16_t)
+    addpchi r10, #bbextents@pchi
+    ldw     r10, r10, #bbextents+4@pclo     ; r10 = bbextents (fixed16_t)
+    addpchi r11, #bbextentt@pchi
+    ldw     r11, r11, #bbextentt+4@pclo     ; r11 = bbextentt (fixed16_t)
+    addpchi r12, #cachewidth@pchi
+    ldw     r12, r12, #cachewidth+4@pclo    ; r12 = cachewidth (int)
+    addpchi r26, #d_sdivzstepv@pchi
+    ldw     r26, r26, #d_sdivzstepv+4@pclo  ; r26 = d_sdivzstepv (float)
 
     ; Pre-calculate 8.0 * x (and store on the stack since we're out of regs).
     ldi     lr, #0x41000000             ; 8.0
-    fmul    s13, s7, lr
-    fmul    s14, s6, lr
-    fmul    s15, s5, lr
-    stw     s13, sp, #0                 ; 8.0 * d_zistepu
-    stw     s14, sp, #4                 ; 8.0 * d_tdivzstepu
-    stw     s15, sp, #8                 ; 8.0 * d_sdivzstepu
+    fmul    r13, r7, lr
+    fmul    r14, r6, lr
+    fmul    r15, r5, lr
+    stw     r13, sp, #0                 ; 8.0 * d_zistepu
+    stw     r14, sp, #4                 ; 8.0 * d_tdivzstepu
+    stw     r15, sp, #8                 ; 8.0 * d_sdivzstepu
 
     ; Pre-load constants.
     ldi     tp, #0x47800000             ; tp = 65536.0
@@ -99,136 +99,136 @@ D_DrawSpans8:
 1:
     ; pdest = (unsigned char *)&viewbuffer[(screenwidth * pspan->v) + pspan->u]
     ; NOTE: Schedule instructions to avoid stalls.
-    ldw     s13, s1, #espan_t_v         ; s13 = pspan->v (int)
-    ldw     s14, s1, #espan_t_u         ; s14 = pspan->u (int)
-    mul     s15, s13, s4
-    itof    s13, s13, z                 ; dv = (float)pspan->v
-    ldw     s16, s1, #espan_t_count     ; s16 = count (int)
-    add     s15, s15, s14
-    itof    s14, s14, z                 ; du = (float)pspan->u
-    ldea    s15, s3, s15                ; s15 = pdest
+    ldw     r13, r1, #espan_t_v         ; r13 = pspan->v (int)
+    ldw     r14, r1, #espan_t_u         ; r14 = pspan->u (int)
+    mul     r15, r13, r4
+    itof    r13, r13, z                 ; dv = (float)pspan->v
+    ldw     r16, r1, #espan_t_count     ; r16 = count (int)
+    add     r15, r15, r14
+    itof    r14, r14, z                 ; du = (float)pspan->u
+    ldea    r15, r3, r15                ; r15 = pdest
 
     ; Calculate the initial s/z, t/z, 1/z, s, and t and clamp.
     ; sdivz = d_sdivzorigin + dv*d_sdivzstepv + du*d_sdivzstepu
     ; tdivz = d_tdivzorigin + dv*d_tdivzstepv + du*d_tdivzstepu
     ; zi = d_ziorigin + dv*d_zistepv + du*d_zistepu
     ; NOTE: Schedule instructions to avoid stalls.
-    fmul    s20, s14, s5
-    fmul    s17, s13, s26
+    fmul    r20, r14, r5
+    fmul    r17, r13, r26
     addpchi lr, #d_tdivzstepv@pchi
     ldw     lr, lr, #d_tdivzstepv+4@pclo
-    fmul    s21, s14, s6
-    fmul    s18, s13, lr
+    fmul    r21, r14, r6
+    fmul    r18, r13, lr
     addpchi lr, #d_zistepv@pchi
     ldw     lr, lr, #d_zistepv+4@pclo
-    fmul    s22, s14, s7
-    fmul    s19, s13, lr
-    fadd    s17, s17, s20
-    fadd    s18, s18, s21
+    fmul    r22, r14, r7
+    fmul    r19, r13, lr
+    fadd    r17, r17, r20
+    fadd    r18, r18, r21
     addpchi lr, #d_sdivzorigin@pchi
     ldw     lr, lr, #d_sdivzorigin+4@pclo
-    fadd    s19, s19, s22
-    fadd    s17, s17, lr                ; s17 = sdivz (float)
+    fadd    r19, r19, r22
+    fadd    r17, r17, lr                ; r17 = sdivz (float)
     addpchi lr, #d_tdivzorigin@pchi
     ldw     lr, lr, #d_tdivzorigin+4@pclo
-    addpchi s20, #d_ziorigin@pchi
-    ldw     s20, s20, #d_ziorigin+4@pclo
-    fadd    s18, s18, lr                ; s18 = tdivz (float)
-    fadd    s19, s19, s20               ; s19 = zi (float)
+    addpchi r20, #d_ziorigin@pchi
+    ldw     r20, r20, #d_ziorigin+4@pclo
+    fadd    r18, r18, lr                ; r18 = tdivz (float)
+    fadd    r19, r19, r20               ; r19 = zi (float)
 
     ; Invert zi and prescale to 16.16 fixed-point
-    fdiv    s20, tp, s19                ; s20 = z = (float)0x10000 / zi
+    fdiv    r20, tp, r19                ; r20 = z = (float)0x10000 / zi
 
     ; s = clamp((int)(sdivz * z) + sadjust, 0, bbextents)
     ; t = clamp((int)(tdivz * z) + tadjust, 0, bbextentt)
-    fmul    s21, s17, s20
-    fmul    s22, s18, s20
-    ftoi    s21, s21, z
-    ftoi    s22, s22, z
-    add     s21, s21, s8
-    max     s21, s21, #0
-    min     s21, s21, s10               ; s21 = s
-    add     s22, s22, s9
-    max     s22, s22, #0
-    min     s22, s22, s11               ; s22 = t
+    fmul    r21, r17, r20
+    fmul    r22, r18, r20
+    ftoi    r21, r21, z
+    ftoi    r22, r22, z
+    add     r21, r21, r8
+    max     r21, r21, #0
+    min     r21, r21, r10               ; r21 = s
+    add     r22, r22, r9
+    max     r22, r22, #0
+    min     r22, r22, r11               ; r22 = t
 
     ; Inner loop: Loop over pixels, up to 8 pixels per iteration.
 2:
-    minu    vl, s16, #8                 ; vl = spancount = min(count, 8)
-    sub     s16, s16, vl                ; count -= spancount
+    minu    vl, r16, #8                 ; vl = spancount = min(count, 8)
+    sub     r16, r16, vl                ; count -= spancount
 
     ; Calculate s and t steps.
-    bz      s16, 3f
+    bz      r16, 3f
 
     ; spancount is 8, so calculate s/z, t/z, zi->fixed s and t at far end of
     ; span, and calculate s and t steps across span by shifting.
-    ldw     s23, sp, #0                 ; 8.0 * d_zistepu
-    ldw     s24, sp, #4                 ; 8.0 * d_tdivzstepu
-    ldw     s25, sp, #8                 ; 8.0 * d_sdivzstepu
-    fadd    s19, s19, s23               ; zi += 8.0 * d_zistepu
-    fadd    s18, s18, s24               ; tdivz += 8.0 * d_tdivzstepu
-    fadd    s17, s17, s25               ; sdivz += 8.0 * d_sdivzstepu
-    fdiv    s20, tp, s19                ; s20 = z = (float)0x10000 / zi
+    ldw     r23, sp, #0                 ; 8.0 * d_zistepu
+    ldw     r24, sp, #4                 ; 8.0 * d_tdivzstepu
+    ldw     r25, sp, #8                 ; 8.0 * d_sdivzstepu
+    fadd    r19, r19, r23               ; zi += 8.0 * d_zistepu
+    fadd    r18, r18, r24               ; tdivz += 8.0 * d_tdivzstepu
+    fadd    r17, r17, r25               ; sdivz += 8.0 * d_sdivzstepu
+    fdiv    r20, tp, r19                ; r20 = z = (float)0x10000 / zi
 
     ; snext = clamp((int)(sdivz * z) + sadjust, 8, bbextents)
     ; tnext = clamp((int)(tdivz * z) + tadjust, 8, bbextentt)
-    fmul    s23, s17, s20
-    fmul    s24, s18, s20
-    ftoi    s23, s23, z
-    ftoi    s24, s24, z
-    add     s23, s23, s8
-    max     s23, s23, #8
-    min     s23, s23, s10               ; s23 = snext
-    add     s24, s24, s9
-    max     s24, s24, #8
-    min     s24, s24, s11               ; s24 = tnext
+    fmul    r23, r17, r20
+    fmul    r24, r18, r20
+    ftoi    r23, r23, z
+    ftoi    r24, r24, z
+    add     r23, r23, r8
+    max     r23, r23, #8
+    min     r23, r23, r10               ; r23 = snext
+    add     r24, r24, r9
+    max     r24, r24, #8
+    min     r24, r24, r11               ; r24 = tnext
 
     ; sstep = (snext - s) >> 3
-    sub     s25, s23, s21
-    asr     s25, s25, #3                ; s25 = sstep
+    sub     r25, r23, r21
+    asr     r25, r25, #3                ; r25 = sstep
 
     ; tstep = (tnext - t) >> 3
-    sub     lr, s24, s22
+    sub     lr, r24, r22
     asr     lr, lr, #3                  ; lr = tstep
 
 4:
 #ifdef __MRISC32_VECTOR_OPS__
-    ldea    v1, s21, s25                ; v1[k] = s + sstep * k
-    ldea    v2, s22, lr                 ; v2[k] = t + tstep * k
+    ldea    v1, r21, r25                ; v1[k] = s + sstep * k
+    ldea    v2, r22, lr                 ; v2[k] = t + tstep * k
     lsr     v1, v1, #16                 ; v1[k] = v1[k] >> 16
     lsr     v2, v2, #16                 ; v2[k] = v2[k] >> 16
-    mul     v2, v2, s12                 ; v2[k] = v2[k] * cachewidth
+    mul     v2, v2, r12                 ; v2[k] = v2[k] * cachewidth
     add     v1, v1, v2                  ; v1[k] = v1[k] + v2[k]
-    ldub    v1, s2, v1                  ; v1[k] = pbase[v1[k]]
-    stb     v1, s15, #1                 ; pdest[k] = v1[k]
-    ldea    s15, s15, vl                ; pdest += spancount
+    ldub    v1, r2, v1                  ; v1[k] = pbase[v1[k]]
+    stb     v1, r15, #1                 ; pdest[k] = v1[k]
+    ldea    r15, r15, vl                ; pdest += spancount
 #else
 #error "Support for non-vectorized operation not implemented yet"
 #endif
 
-    mov     s21, s23                    ; s = snext
-    mov     s22, s24                    ; t = tnext
+    mov     r21, r23                    ; s = snext
+    mov     r22, r24                    ; t = tnext
 
-    bnz     s16, 2b                     ; while (count > 0)
+    bnz     r16, 2b                     ; while (count > 0)
 
-    ldw     s1, s1, #espan_t_pnext      ; pspan = pspan->pnext
-    bnz     s1, 1b                      ; while (pspan != NULL)
+    ldw     r1, r1, #espan_t_pnext      ; pspan = pspan->pnext
+    bnz     r1, 1b                      ; while (pspan != NULL)
 
     ; Restore callee saved registers from the stack.
     ldw     lr, sp, #12
     ldw     fp, sp, #16
     ldw     tp, sp, #20
-    ldw     s26, sp, #24
-    ldw     s25, sp, #28
-    ldw     s24, sp, #32
-    ldw     s23, sp, #36
-    ldw     s22, sp, #40
-    ldw     s21, sp, #44
-    ldw     s20, sp, #48
-    ldw     s19, sp, #52
-    ldw     s18, sp, #56
-    ldw     s17, sp, #60
-    ldw     s16, sp, #64
+    ldw     r26, sp, #24
+    ldw     r25, sp, #28
+    ldw     r24, sp, #32
+    ldw     r23, sp, #36
+    ldw     r22, sp, #40
+    ldw     r21, sp, #44
+    ldw     r20, sp, #48
+    ldw     r19, sp, #52
+    ldw     r18, sp, #56
+    ldw     r17, sp, #60
+    ldw     r16, sp, #64
     add     sp, sp, #68
     ret
 
@@ -243,33 +243,33 @@ D_DrawSpans8:
     bz      fp, 4b                      ; Early-out if spancount == 1
                                         ; (and hide some of the itof latency)
 
-    fmul    s23, s7, lr
-    fmul    s24, s6, lr
-    fmul    s25, s5, lr
-    fadd    s19, s19, s23               ; zi += (spancount - 1) * d_zistepu
-    fadd    s18, s18, s24               ; tdivz += (spancount - 1) * d_tdivzstepu
-    fadd    s17, s17, s25               ; sdivz += (spancount - 1) * d_sdivzstepu
-    fdiv    s20, tp, s19                ; s20 = z = (float)0x10000 / zi
+    fmul    r23, r7, lr
+    fmul    r24, r6, lr
+    fmul    r25, r5, lr
+    fadd    r19, r19, r23               ; zi += (spancount - 1) * d_zistepu
+    fadd    r18, r18, r24               ; tdivz += (spancount - 1) * d_tdivzstepu
+    fadd    r17, r17, r25               ; sdivz += (spancount - 1) * d_sdivzstepu
+    fdiv    r20, tp, r19                ; r20 = z = (float)0x10000 / zi
 
     ; snext = clamp((int)(sdivz * z) + sadjust, 8, bbextents)
     ; tnext = clamp((int)(tdivz * z) + tadjust, 8, bbextentt)
-    fmul    s23, s17, s20
-    fmul    s24, s18, s20
-    ftoi    s23, s23, z
-    ftoi    s24, s24, z
-    add     s23, s23, s8
-    max     s23, s23, #8
-    min     s23, s23, s10               ; s23 = snext
-    add     s24, s24, s9
-    max     s24, s24, #8
-    min     s24, s24, s11               ; s24 = tnext
+    fmul    r23, r17, r20
+    fmul    r24, r18, r20
+    ftoi    r23, r23, z
+    ftoi    r24, r24, z
+    add     r23, r23, r8
+    max     r23, r23, #8
+    min     r23, r23, r10               ; r23 = snext
+    add     r24, r24, r9
+    max     r24, r24, #8
+    min     r24, r24, r11               ; r24 = tnext
 
     ; sstep = (snext - s) / (spancount - 1)
-    sub     s25, s23, s21
-    div     s25, s25, fp                ; s25 = sstep
+    sub     r25, r23, r21
+    div     r25, r25, fp                ; r25 = sstep
 
     ; tstep = (tnext - t) / (spancount - 1)
-    sub     lr, s24, s22
+    sub     lr, r24, r22
     div     lr, lr, fp                  ; lr = tstep
 
     b       4b
@@ -282,7 +282,7 @@ D_DrawSpans8:
 ;-----------------------------------------------------------------------------
 ; void D_DrawZSpans (espan_t *pspan)
 ;
-; s1 = pspan
+; r1 = pspan
 ;-----------------------------------------------------------------------------
 
 #ifdef __MRISC32_HARD_FLOAT__
@@ -292,78 +292,78 @@ D_DrawSpans8:
     .type       D_DrawZSpans, @function
 
 D_DrawZSpans:
-    addpchi s2, #d_pzbuffer@pchi
-    ldw     s2, s2, #d_pzbuffer+4@pclo  ; s2 = d_pzbuffer (short *)
-    addpchi s3, #d_zwidth@pchi
-    ldw     s3, s3, #d_zwidth+4@pclo    ; s3 = d_zwidth (unsigned int)
-    addpchi s4, #d_ziorigin@pchi
-    ldw     s4, s4, #d_ziorigin+4@pclo  ; s4 = d_ziorigin (float)
-    addpchi s5, #d_zistepu@pchi
-    ldw     s5, s5, #d_zistepu+4@pclo   ; s5 = d_zistepu (float)
-    addpchi s6, #d_zistepv@pchi
-    ldw     s6, s6, #d_zistepv+4@pclo   ; s6 = d_zistepv (float)
+    addpchi r2, #d_pzbuffer@pchi
+    ldw     r2, r2, #d_pzbuffer+4@pclo  ; r2 = d_pzbuffer (short *)
+    addpchi r3, #d_zwidth@pchi
+    ldw     r3, r3, #d_zwidth+4@pclo    ; r3 = d_zwidth (unsigned int)
+    addpchi r4, #d_ziorigin@pchi
+    ldw     r4, r4, #d_ziorigin+4@pclo  ; r4 = d_ziorigin (float)
+    addpchi r5, #d_zistepu@pchi
+    ldw     r5, r5, #d_zistepu+4@pclo   ; r5 = d_zistepu (float)
+    addpchi r6, #d_zistepv@pchi
+    ldw     r6, r6, #d_zistepv+4@pclo   ; r6 = d_zistepv (float)
 
-    ldi     s7, #31                     ; s7 = 31 (used for ftoi)
-    ftoir   s12, s5, s7                 ; s12 = izistep = (int)(d_zistepu * 2^31)
+    ldi     r7, #31                     ; r7 = 31 (used for ftoi)
+    ftoir   r12, r5, r7                 ; r12 = izistep = (int)(d_zistepu * 2^31)
 
     ; Outer loop.
 1:
     ; Calculate the initial 1/z
-    ldw     s11, s1, #espan_t_v         ; s11 = pspan->v (int)
-    ldw     s10, s1, #espan_t_u         ; s10 = pspan->u (int)
-    mul     s8, s11, s3
-    itof    s11, s11, z                 ; s11 = dv = (float)pspan->v
-    ldw     s9, s1, #espan_t_count      ; s9 = count (int)
-    add     s8, s8, s10
-    itof    s10, s10, z                 ; s10 = du = (float)pspan->u
-    ldea    s8, s2, s8*2                ; s8 = pdest (short*)
-    fmul    s11, s11, s6
-    fmul    s10, s10, s5
-    fadd    s10, s10, s11
-    fadd    s10, s10, s4                ; s10 = zi = d_ziorigin + dv*d_zistepv + du*d_zistepu
-    ftoir   s10, s10, s7                ; s10 = izi = (int)(zi * 2^31)
+    ldw     r11, r1, #espan_t_v         ; r11 = pspan->v (int)
+    ldw     r10, r1, #espan_t_u         ; r10 = pspan->u (int)
+    mul     r8, r11, r3
+    itof    r11, r11, z                 ; r11 = dv = (float)pspan->v
+    ldw     r9, r1, #espan_t_count      ; r9 = count (int)
+    add     r8, r8, r10
+    itof    r10, r10, z                 ; r10 = du = (float)pspan->u
+    ldea    r8, r2, r8*2                ; r8 = pdest (short*)
+    fmul    r11, r11, r6
+    fmul    r10, r10, r5
+    fadd    r10, r10, r11
+    fadd    r10, r10, r4                ; r10 = zi = d_ziorigin + dv*d_zistepv + du*d_zistepu
+    ftoir   r10, r10, r7                ; r10 = izi = (int)(zi * 2^31)
 
     ; Handle un-aligned head.
-    and     s11, s8, #2
-    bz      s11, 2f
-    lsr     s11, s10, #16               ; s11 = (short)(izi >> 16)
-    add     s10, s10, s12               ; izi += izistep
-    add     s8, s8, #2                  ; pdest++
-    add     s9, s9, #-1                 ; count--
-    sth     s11, s8, #-2                ; *pdest = s11
+    and     r11, r8, #2
+    bz      r11, 2f
+    lsr     r11, r10, #16               ; r11 = (short)(izi >> 16)
+    add     r10, r10, r12               ; izi += izistep
+    add     r8, r8, #2                  ; pdest++
+    add     r9, r9, #-1                 ; count--
+    sth     r11, r8, #-2                ; *pdest = r11
 
 2:
-    lsr     s13, s9, #1                 ; s13 = doublecount
-    bz      s13, 4f
+    lsr     r13, r9, #1                 ; r13 = doublecount
+    bz      r13, 4f
 
     ; Inner loop (two 1/z values per iteration).
 3:
-    add     s14, s10, s12               ; izi += izistep
+    add     r14, r10, r12               ; izi += izistep
 #ifdef __MRISC32_PACKED_OPS__
-    packhi  s11, s14, s10
+    packhi  r11, r14, r10
 #else
-    shuf    s15, s14, #0b0011010100100  ; s15 = s14 & 0xffff0000
-    lsr     s11, s10, #16
-    or      s11, s15, s11
+    shuf    r15, r14, #0b0011010100100  ; r15 = r14 & 0xffff0000
+    lsr     r11, r10, #16
+    or      r11, r15, r11
 #endif
-    add     s10, s14, s12               ; izi += izistep
-    add     s13, s13, #-1               ; doublecount--
-    stw     s11, s8, #0                 ; *(int*)pdest = (s14 & 0xffff0000 | (s10 >> 16))
-    add     s8, s8, #4                  ; pdest += 2
-    bnz     s13, 3b
+    add     r10, r14, r12               ; izi += izistep
+    add     r13, r13, #-1               ; doublecount--
+    stw     r11, r8, #0                 ; *(int*)pdest = (r14 & 0xffff0000 | (r10 >> 16))
+    add     r8, r8, #4                  ; pdest += 2
+    bnz     r13, 3b
 
 4:
-    ldw     s1, s1, #espan_t_pnext      ; pspan = pspan->pnext
+    ldw     r1, r1, #espan_t_pnext      ; pspan = pspan->pnext
 
     ; Handle un-aligned tail.
-    and     s9, s9, #1
-    bz      s9, 5f
-    lsr     s11, s10, #16               ; s11 = (short)(izi >> 16)
-    sth     s11, s8, #0                 ; *pdest = s11
+    and     r9, r9, #1
+    bz      r9, 5f
+    lsr     r11, r10, #16               ; r11 = (short)(izi >> 16)
+    sth     r11, r8, #0                 ; *pdest = r11
 
 5:
     ; while (pspan != NULL)
-    bnz     s1, 1b
+    bnz     r1, 1b
 
     ret
 
