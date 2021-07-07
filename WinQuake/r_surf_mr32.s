@@ -34,32 +34,32 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 .macro R_DrawSurfaceBlock8 count, l2count
     ; Get the outer loop counter (and skip to the end if zero).
     addpchi r10, #r_numvblocks@pchi
-    ldw     r10, r10, #r_numvblocks+4@pclo  ; r10 = v (= r_numvblocks)
+    ldw     r10, [r10, #r_numvblocks+4@pclo] ; r10 = v (= r_numvblocks)
     bz      r10, 2$
 
     ; Save callee saved registers.
     add     sp, sp, #-4
-    stw     vl, sp, #0
+    stw     vl, [sp, #0]
 
     ; Pre-load global variables into registers.
     addpchi r1, #sourcetstep@pchi
-    ldw     r1, r1, #sourcetstep+4@pclo     ; r1 = sourcetstep
+    ldw     r1, [r1, #sourcetstep+4@pclo]    ; r1 = sourcetstep
     addpchi r2, #surfrowbytes@pchi
-    ldw     r2, r2, #surfrowbytes+4@pclo    ; r2 = surfrowbytes
+    ldw     r2, [r2, #surfrowbytes+4@pclo]   ; r2 = surfrowbytes
     addpchi r3, #r_lightwidth@pchi
-    ldw     r3, r3, #r_lightwidth+4@pclo    ; r3 = r_lightwidth
+    ldw     r3, [r3, #r_lightwidth+4@pclo]   ; r3 = r_lightwidth
     addpchi r4, #r_sourcemax@pchi
-    ldw     r4, r4, #r_sourcemax+4@pclo     ; r4 = r_sourcemax
+    ldw     r4, [r4, #r_sourcemax+4@pclo]    ; r4 = r_sourcemax
     addpchi r5, #r_stepback@pchi
-    ldw     r5, r5, #r_stepback+4@pclo      ; r5 = r_stepback
+    ldw     r5, [r5, #r_stepback+4@pclo]     ; r5 = r_stepback
     addpchi r6, #r_lightptr@pchi
-    ldw     r6, r6, #r_lightptr+4@pclo      ; r6 = r_lightptr
+    ldw     r6, [r6, #r_lightptr+4@pclo]     ; r6 = r_lightptr
     addpchi r7, #vid+4@pchi
-    ldw     r7, r7, #vid+4+4@pclo           ; r7 = vid.colormap (vid+4)
+    ldw     r7, [r7, #vid+4+4@pclo]          ; r7 = vid.colormap (vid+4)
     addpchi r8, #pbasesource@pchi
-    ldw     r8, r8, #pbasesource+4@pclo     ; r8 = pbasesource
+    ldw     r8, [r8, #pbasesource+4@pclo]    ; r8 = pbasesource
     addpchi r9, #prowdestbase@pchi
-    ldw     r9, r9, #prowdestbase+4@pclo    ; r9 = prowdestbase
+    ldw     r9, [r9, #prowdestbase+4@pclo]   ; r9 = prowdestbase
 
     ; Set up vector operation.
     ldi     vl, #\count         ; We use the same VL for all iterations.
@@ -69,13 +69,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
     ; Outer loop.
 1$:
     ; Set up light step & boundaries for this iteration.
-    ldw     r11, r6, #0         ; r11 = lightleft = r_lightptr[0]
-    ldw     r12, r6, #4         ; r12 = lightright = r_lightptr[1]
-    ldea    r6, r6, r3 * 4      ; r_lightptr += r_lightwidth
-    ldw     r13, r6, #0
+    ldw     r11, [r6, #0]       ; r11 = lightleft = r_lightptr[0]
+    ldw     r12, [r6, #4]       ; r12 = lightright = r_lightptr[1]
+    ldea    r6, [r6, r3 * 4]    ; r_lightptr += r_lightwidth
+    ldw     r13, [r6, #0]
     sub     r13, r13, r11
     asr     r13, r13, #\l2count ; r13 = lightleftstep = (r_lightptr[0] - lightleft) >> l2count
-    ldw     r14, r6, #4
+    ldw     r14, [r6, #4]
     sub     r14, r14, r12
     asr     r14, r14, #\l2count ; r14 = lightrightstep = (r_lightptr[1] - lightright) >> l2count
 
@@ -83,15 +83,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
     .rept   \count
         sub     r15, r12, r11
         asr     r15, r15, #\l2count ; r15 = lightstep = (lightright - lightleft) >> l2count
-        ldub    v1, r8, #1          ; v1 = pbasesource[b]
-        ldea    v2, r11, r15        ; v2 = lightleft + lightstep*b
+        ldub    v1, [r8, #1]        ; v1 = pbasesource[b]
+        ldea    v2, [r11, r15]      ; v2 = lightleft + lightstep*b
         sel.231 v1, v3, v2          ; v1 = (v2 & 0xff00) | v1
-        ldub    v1, r7, v1          ; v1 = vid.colormap[(v2 & 0xff00) | v1]
-        stb     v1, r9, #1          ; prowdestbase[b] = v1
-        ldea    r8, r8, r1          ; pbasesource += sourcetstep
+        ldub    v1, [r7, v1]        ; v1 = vid.colormap[(v2 & 0xff00) | v1]
+        stb     v1, [r9, #1]        ; prowdestbase[b] = v1
+        ldea    r8, [r8, r1]        ; pbasesource += sourcetstep
         add     r11, r11, r13       ; lightleft += lightleftstep
         add     r12, r12, r14       ; lightright += lightrightstep
-        ldea    r9, r9, r2          ; prowdestbase += surfrowbytes
+        ldea    r9, [r9, r2]        ; prowdestbase += surfrowbytes
     .endr
 
     sle     r15, r4, r8         ; pbasesource >= r_sourcemax?
@@ -103,10 +103,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
     ; Store the final value of r_lightptr.
     addpchi r1, #r_lightptr@pchi
-    stw     r6, r1, #r_lightptr+4@pclo
+    stw     r6, [r1, #r_lightptr+4@pclo]
 
     ; Restore callee saved registers.
-    ldw     vl, sp, #0
+    ldw     vl, [sp, #0]
     add     sp, sp, #4
 
 2$:
