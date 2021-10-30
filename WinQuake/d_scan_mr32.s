@@ -98,7 +98,7 @@ D_DrawSpans8:
     ; Outer loop: Loop over spans.
 1:
     ; pdest = (unsigned char *)&viewbuffer[(screenwidth * pspan->v) + pspan->u]
-    ; NOTE: Schedule instructions to avoid stalls.
+    ; NOTE: Schedule instructions and use madd to avoid stalls.
     ldw     r13, [r1, #espan_t_v]       ; r13 = pspan->v (int)
     ldw     r14, [r1, #espan_t_u]       ; r14 = pspan->u (int)
     mul     r15, r13, r4
@@ -197,8 +197,7 @@ D_DrawSpans8:
     ldea    v2, [r22, lr]               ; v2[k] = t + tstep * k
     lsr     v1, v1, #16                 ; v1[k] = v1[k] >> 16
     lsr     v2, v2, #16                 ; v2[k] = v2[k] >> 16
-    mul     v2, v2, r12                 ; v2[k] = v2[k] * cachewidth
-    add     v1, v1, v2                  ; v1[k] = v1[k] + v2[k]
+    madd    v1, v2, r12                 ; v1[k] = v1[k] + v2[k] * cachewidth
     ldub    v1, [r2, v1]                ; v1[k] = pbase[v1[k]]
     stb     v1, [r15, #1]               ; pdest[k] = v1[k]
     ldea    r15, [r15, vl]              ; pdest += spancount
@@ -309,6 +308,7 @@ D_DrawZSpans:
     ; Outer loop.
 1:
     ; Calculate the initial 1/z
+    ; NOTE: Schedule instructions and use madd to avoid stalls.
     ldw     r11, [r1, #espan_t_v]       ; r11 = pspan->v (int)
     ldw     r10, [r1, #espan_t_u]       ; r10 = pspan->u (int)
     mul     r8, r11, r3
