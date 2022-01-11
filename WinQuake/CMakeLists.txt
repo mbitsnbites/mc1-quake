@@ -148,13 +148,3 @@ target_link_libraries(mc1quake PRIVATE ${LIBS} ${SANITIZERS})
 set_property(TARGET mc1quake PROPERTY C_STANDARD 11)
 set_property(TARGET mc1quake PROPERTY C_EXTENSIONS OFF)
 
-# For MC1, we add a step to convert the ELF binary to a raw binary.
-if(MC1)
-  add_custom_command(OUTPUT mc1quake.bin
-                     DEPENDS mc1quake
-                     COMMAND ${CMAKE_OBJCOPY} ARGS -O binary mc1quake mc1quake.bin
-                     COMMENT "Generate raw binary")
-  add_custom_target(mc1quake_raw ALL
-                    DEPENDS mc1quake.bin)
-endif()	
-

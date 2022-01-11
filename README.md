@@ -27,7 +27,7 @@ $ cmake -G Ninja -DCMAKE_TOOLCHAIN_FILE=../mc1-toolchain.cmake -DCMAKE_BUILD_TYP
 $ ninja
 ```
 
-The resulting binary is `src/out/mc1quake.bin`.
+The resulting ELF binary is `src/out/mc1quake`.
 
 ## Building for other platforms
 
