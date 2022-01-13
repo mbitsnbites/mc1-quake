@@ -119,6 +119,12 @@ else()
   list(APPEND LIBS m)
 endif()
 
+# Always warn for unnecessary use of double-precision.
+if(CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID MATCHES "Clang")
+  list(APPEND OPTS
+       -Wdouble-promotion)
+endif()
+
 set(SANITIZE OFF)
 
 if(SANITIZE)

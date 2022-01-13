@@ -297,6 +297,7 @@ double Sys_FloatTime (void)
 	static qboolean s_first = true;
 	static struct timeval s_t0;
 	struct timeval t;
+	float t_sec;
 
 	if (s_first)
 	{
@@ -304,8 +305,9 @@ double Sys_FloatTime (void)
 		s_first = false;
 	}
 	gettimeofday (&t, NULL);
-	return (double)(t.tv_sec - s_t0.tv_sec) +
-		   0.000001 * (double)(t.tv_usec - s_t0.tv_usec);
+	t_sec = (float)(t.tv_sec - s_t0.tv_sec) +
+			0.000001F * (float)(t.tv_usec - s_t0.tv_usec);
+	return (double)t_sec;
 #else
 	// MC1 timing: Use CLKCNTHI:CLKCNTLO MMIO registers directly.
 	static qboolean s_first = true;
@@ -363,7 +365,8 @@ void Sys_LowFPPrecision (void)
 void main (int argc, char **argv)
 {
 	static quakeparms_t parms;
-	double oldtime, newtime, time;
+	double oldtime, newtime;
+	float time;
 
 	parms.memsize = 8 * 1024 * 1024;
 	parms.membase = malloc (parms.memsize);
@@ -383,12 +386,12 @@ void main (int argc, char **argv)
 	{
 		// find time spent rendering last frame
 		newtime = Sys_FloatTime ();
-		time = newtime - oldtime;
+		time = (float)(newtime - oldtime);
 
-		if (time > sys_ticrate.value * 2)
+		if (time > (sys_ticrate.value * 2.0F))
 			oldtime = newtime;
 		else
-			oldtime += time;
+			oldtime += (double)time;
 
 		Host_Frame (time);
 	}

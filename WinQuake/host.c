@@ -37,7 +37,7 @@ quakeparms_t host_parms;
 
 qboolean	host_initialized;		// true if into command execution
 
-double		host_frametime;
+float		host_frametime;
 double		host_time;
 double		realtime;				// without any filtering or bounding
 double		oldrealtime;			// last frame run
@@ -500,23 +500,29 @@ Returns false if the time is too short to run a frame
 */
 qboolean Host_FilterTime (float time)
 {
-	realtime += time;
+	float _new_host_frametime;
 
-	if (!cls.timedemo && realtime - oldrealtime < 1.0/72.0)
+	realtime += (double)time;
+
+	_new_host_frametime = (float)(realtime - oldrealtime);
+	if (!cls.timedemo && _new_host_frametime < (1.0F/72.0F))
 		return false;		// framerate is too high
 
-	host_frametime = realtime - oldrealtime;
 	oldrealtime = realtime;
 
-	if (host_framerate.value > 0)
-		host_frametime = host_framerate.value;
+	if (host_framerate.value > 0.0F)
+	{
+		_new_host_frametime = host_framerate.value;
+	}
 	else
 	{	// don't allow really long or short frames
-		if (host_frametime > 0.1)
-			host_frametime = 0.1;
-		if (host_frametime < 0.001)
-			host_frametime = 0.001;
+		if (_new_host_frametime > 0.1F)
+			_new_host_frametime = 0.1F;
+		if (_new_host_frametime < 0.001F)
+			_new_host_frametime = 0.001F;
 	}
+
+	host_frametime = _new_host_frametime;
 	
 	return true;
 }
@@ -630,7 +636,7 @@ Host_Frame
 Runs all active servers
 ==================
 */
-void _Host_Frame (float time)
+static void _Host_Frame (float time)
 {
 	static double		time1 = 0;
 	static double		time2 = 0;
@@ -685,7 +691,7 @@ void _Host_Frame (float time)
 	if (!sv.active)
 		CL_SendCmd ();
 
-	host_time += host_frametime;
+	host_time += (double)host_frametime;
 
 // fetch results from server
 	if (cls.state == ca_connected)
@@ -715,10 +721,10 @@ void _Host_Frame (float time)
 
 	if (host_speeds.value)
 	{
-		pass1 = (time1 - time3)*1000;
+		pass1 = (int)(1000.0F * (float)(time1 - time3));
 		time3 = Sys_FloatTime ();
-		pass2 = (time2 - time1)*1000;
-		pass3 = (time3 - time2)*1000;
+		pass2 = (int)(1000.0F * (float)(time2 - time1));
+		pass3 = (int)(1000.0F * (float)(time3 - time2));
 		Con_Printf ("%3i tot %3i server %3i gfx %3i snd\n",
 					pass1+pass2+pass3, pass1, pass2, pass3);
 	}
@@ -846,7 +852,7 @@ void Host_Init (quakeparms_t *parms)
 	host_parms = *parms;
 
 	if (parms->memsize < minimum_memory)
-		Sys_Error ("Only %4.1f megs of memory available, can't execute game", parms->memsize / (float)0x100000);
+		Sys_Error ("Only %4.1f megs of memory available, can't execute game", parms->memsize / (double)0x100000);
 
 	com_argc = parms->argc;
 	com_argv = parms->argv;

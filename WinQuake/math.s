@@ -36,27 +36,6 @@ Ljmptab:	.long	Lcase0, Lcase1, Lcase2, Lcase3
 
 	.text
 
-// TODO: rounding needed?
-// stack parameter offset
-#define	val	4
-
-.globl C(Invert24To16)
-C(Invert24To16):
-
-	movl	val(%esp),%ecx
-	movl	$0x100,%edx		// 0x10000000000 as dividend
-	cmpl	%edx,%ecx
-	jle		LOutOfRange
-
-	subl	%eax,%eax
-	divl	%ecx
-
-	ret
-
-LOutOfRange:
-	movl	$0xFFFFFFFF,%eax
-	ret
-
 #define	in	4
 #define out	8
 
