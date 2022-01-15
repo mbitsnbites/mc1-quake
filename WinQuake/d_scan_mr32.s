@@ -443,5 +443,67 @@ D_DrawTurbulent8Span:
 
 #endif  /* __MRISC32_HARD_FLOAT__ */
 
+
+;-----------------------------------------------------------------------------
+; void D_WarpScreenKernel (int src_w, int src_h, int *turb, byte **rowptr,
+;                          int *column, byte *dest, int dest_stride)
+;
+; r1 = src_w
+; r2 = src_h
+; r3 = turb
+; r4 = rowptr
+; r5 = column
+; r6 = dest
+; r7 = dest_stride
+;-----------------------------------------------------------------------------
+
+    .p2align    5
+    .global     D_WarpScreenKernel
+    .type       D_WarpScreenKernel, @function
+
+D_WarpScreenKernel:
+    ble     r2, 3f
+    ble     r1, 3f
+
+    mov     r10, r3                 ; r10 = &turb[v]
+
+1:
+    ; col = &column[turb[v]]
+    ldw     r9, [r10]
+    ldea    r9, [r5, r9*4]          ; r9 = col
+
+    mov     r11, r3                 ; r11 = &turb[u]
+
+    getsr   vl, #0x10
+    mov     r8, r1
+2:
+    min     vl, vl, r8
+    sub     r8, r8, vl
+
+    ; *dest = row[turb[u]][col[u]]
+    ldw     v1, [r11, #4]           ; *turb
+    ldw     v1, [r4, v1*4]          ; row[*turb]
+    ldw     v2, [r9, #4]            ; *col
+    add     v1, v1, v2
+    ldub    v1, [z, v1]
+    stb     v1, [r6, #1]
+
+    ldea    r6, [r6, vl]            ; dest++
+    ldea    r11, [r11, vl*4]        ; turb++
+    ldea    r9, [r9, vl*4]          ; col++
+
+    bgt     r8, 2b
+
+    add     r10, r10, #4            ; turb++
+    add     r4, r4, #4              ; rowptr++
+
+    add     r2, r2, #-1
+    bgt     r2, 1b
+
+3:
+    ret
+
+    .size   D_WarpScreenKernel, .-D_WarpScreenKernel
+
 #endif  /* __MRISC32__ */
 

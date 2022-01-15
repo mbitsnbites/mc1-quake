@@ -32,6 +32,18 @@ int				r_turb_spancount;
 
 void D_DrawTurbulent8Span (void);
 
+#if defined(__MRISC32__)
+
+void D_WarpScreenKernel (int src_w,
+						 int src_h,
+						 int *turb,
+						 byte **rowptr,
+						 int *column,
+						 byte *dest,
+						 int dest_stride);
+
+#else
+
 static void D_WarpScreenKernel (int src_w,
 								int src_h,
 								int *turb,
@@ -60,6 +72,8 @@ static void D_WarpScreenKernel (int src_w,
 		dest += dest_stride - src_w;
 	}
 }
+
+#endif  // !defined(__MRISC32__)
 
 /*
 =============
