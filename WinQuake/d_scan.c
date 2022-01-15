@@ -32,6 +32,34 @@ int				r_turb_spancount;
 
 void D_DrawTurbulent8Span (void);
 
+static void D_WarpScreenKernel (int src_w,
+								int src_h,
+								int *turb,
+								byte **rowptr,
+								int *column,
+								byte *dest,
+								int dest_stride)
+{
+	int u, v;
+	int *col;
+	byte **row;
+
+	for (v = 0; v < src_h; v++)
+	{
+		col = &column[turb[v]];
+		row = &rowptr[v];
+
+		for (u = 0; u < src_w; u += 4)
+		{
+			*dest++ = row[turb[u + 0]][col[u + 0]];
+			*dest++ = row[turb[u + 1]][col[u + 1]];
+			*dest++ = row[turb[u + 2]][col[u + 2]];
+			*dest++ = row[turb[u + 3]][col[u + 3]];
+		}
+
+		dest += dest_stride - src_w;
+	}
+}
 
 /*
 =============
@@ -78,19 +106,7 @@ void D_WarpScreen (void)
 	turb = intsintable + ((int)(cl.time*SPEED)&(CYCLE-1));
 	dest = vid.buffer + scr_vrect.y * _vid_rowbytes + scr_vrect.x;
 
-	for (v=0 ; v<src_h ; v++, dest += _vid_rowbytes)
-	{
-		col = &column[turb[v]];
-		row = &rowptr[v];
-
-		for (u=0 ; u<src_w ; u+=4)
-		{
-			dest[u+0] = row[turb[u+0]][col[u+0]];
-			dest[u+1] = row[turb[u+1]][col[u+1]];
-			dest[u+2] = row[turb[u+2]][col[u+2]];
-			dest[u+3] = row[turb[u+3]][col[u+3]];
-		}
-	}
+	D_WarpScreenKernel(src_w, src_h,turb, &rowptr[0], &column[0], dest, _vid_rowbytes);
 }
 
 
