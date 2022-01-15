@@ -371,5 +371,77 @@ D_DrawZSpans:
 
 #endif  /* __MRISC32_HARD_FLOAT__ */
 
+
+;-----------------------------------------------------------------------------
+; void D_DrawTurbulent8Span (void)
+;-----------------------------------------------------------------------------
+
+#ifdef __MRISC32_HARD_FLOAT__
+
+    .p2align    5
+    .global     D_DrawTurbulent8Span
+    .type       D_DrawTurbulent8Span, @function
+
+D_DrawTurbulent8Span:
+    ldwpc   r1, #r_turb_s@pc            ; r1 = r_turb_s (fixed16_t)
+    ldwpc   r2, #r_turb_t@pc            ; r2 = r_turb_t (fixed16_t)
+    ldwpc   r3, #r_turb_sstep@pc        ; r3 = r_turb_sstep (fixed16_t)
+    ldwpc   r4, #r_turb_tstep@pc        ; r4 = r_turb_tstep (fixed16_t)
+    ldwpc   r5, #r_turb_spancount@pc    ; r5 = r_turb_spancount (int)
+    ldwpc   r6, #r_turb_turb@pc         ; r6 = r_turb_turb (int*)
+    ldwpc   r7, #r_turb_pbase@pc        ; r7 = r_turb_pbase (unsigned char*)
+    ldwpc   r8, #r_turb_pdest@pc        ; r8 = r_turb_pdest (unsigned char*)
+
+    getsr   vl, #0x10
+    ldea    v1, r1, r3
+    ldea    v2, r2, r4
+
+    madd    r1, r3, r5                  ; r_turb_s += r_turb_sstep * r_turb_spancount
+    madd    r2, r4, r5                  ; r_turb_t += r_turb_tstep * r_turb_spancount
+
+    mul     r3, r3, vl
+    mul     r4, r4, vl
+
+1:
+    min     vl, vl, r5
+    sub     r5, r5, vl
+
+    ; sturb = ((r_turb_s + r_turb_turb[(r_turb_t >> 16) & (CYCLE-1)]) >> 16) & 63
+    ebfu    v9, v2, #<16:7>
+    ldw     v9, [r6, v9 * 4]
+    add     v9, v1, v9
+    ebfu    v9, v9, #<16:6>
+
+    ; tturb = ((r_turb_t + r_turb_turb[(r_turb_s >> 16) & (CYCLE-1)]) >> 16) & 63
+    ebfu    v10, v1, #<16:7>
+    ldw     v10, [r6, v10 * 4]
+    add     v10, v2, v10
+    ebfu    v10, v10, #<16:6>
+
+    ; *r_turb_pdest++ = r_turb_pbase[(tturb << 6) + sturb]
+    ibf     v9, v10, #<6:6>
+    ldub    v9, [r7, v9]
+    stb     v9, [r8, #1]
+    add     r8, r8, vl
+
+	; r_turb_s += r_turb_sstep
+	add     v1, v1, r3
+
+    ; r_turb_t += r_turb_tstep
+	add     v2, v2, r4
+
+    ; while (--r_turb_spancount > 0)
+    bgt     r5, 1b
+
+    stwpc   r1, #r_turb_s@pc
+    stwpc   r2, #r_turb_t@pc
+    stwpc   r8, #r_turb_pdest@pc
+
+    ret
+
+    .size   D_DrawTurbulent8Span, .-D_DrawTurbulent8Span
+
+#endif  /* __MRISC32_HARD_FLOAT__ */
+
 #endif  /* __MRISC32__ */
 

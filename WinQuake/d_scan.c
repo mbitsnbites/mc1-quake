@@ -94,7 +94,7 @@ void D_WarpScreen (void)
 }
 
 
-#if	!id386
+#if	!id386 && !defined(__MRISC32_HARD_FLOAT__)
 
 /*
 =============
@@ -117,22 +117,20 @@ void D_DrawTurbulent8Span (void)
 
 	do
 	{
-		sturb = ((_r_turb_s + _r_turb_turb[(_r_turb_t>>16)&(CYCLE-1)])>>16)&63;
-		tturb = ((_r_turb_t + _r_turb_turb[(_r_turb_s>>16)&(CYCLE-1)])>>16)&63;
-		*_r_turb_pdest++ = *(_r_turb_pbase + (tturb<<6) + sturb);
+		sturb = ((_r_turb_s + _r_turb_turb[(_r_turb_t >> 16) & (CYCLE-1)]) >> 16) & 63;
+		tturb = ((_r_turb_t + _r_turb_turb[(_r_turb_s >> 16) & (CYCLE-1)]) >> 16) & 63;
+		*_r_turb_pdest++ = _r_turb_pbase[(tturb << 6) + sturb];
 		_r_turb_s += _r_turb_sstep;
 		_r_turb_t += _r_turb_tstep;
 	} while (--_r_turb_spancount > 0);
 
 	// Update global variables.
-	r_turb_pbase = _r_turb_pbase;
 	r_turb_pdest = _r_turb_pdest;
 	r_turb_s = _r_turb_s;
 	r_turb_t = _r_turb_t;
-	r_turb_spancount = _r_turb_spancount;
 }
 
-#endif	// !id386
+#endif	// !id386 && !defined(__MRISC32_HARD_FLOAT__)
 
 
 /*
