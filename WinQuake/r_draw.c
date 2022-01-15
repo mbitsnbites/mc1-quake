@@ -72,6 +72,18 @@ qboolean	r_lastvertvalid;
 
 #if	!id386
 
+static inline int FastCeil(float x)
+{
+#if 0
+	return 32768 - (int)(32768.0F - x);
+#else
+	int i = (int)x;
+	if ((float)i < x)
+		++i;
+	return i;
+#endif
+}
+
 /*
 ================
 R_EmitEdge
@@ -123,7 +135,7 @@ void R_EmitEdge (mvertex_t *pv0, mvertex_t *pv1)
 		if (v0 > r_refdef.fvrectbottom_adj)
 			v0 = r_refdef.fvrectbottom_adj;
 	
-		ceilv0 = (int) ceilf(v0);
+		ceilv0 = FastCeil(v0);
 	}
 
 	world = &pv1->position[0];
@@ -163,7 +175,7 @@ void R_EmitEdge (mvertex_t *pv0, mvertex_t *pv1)
 
 	r_emitted = 1;
 
-	r_ceilv1 = (int) ceilf(r_v1);
+	r_ceilv1 = FastCeil(r_v1);
 
 
 // create the edge
