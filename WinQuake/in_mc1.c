@@ -67,6 +67,7 @@ void IN_Move (usercmd_t *cmd)
 	float mouse_y = (float)(new_mouse_y - s_old_mouse_y);
 	s_old_mouse_x = new_mouse_x;
 	s_old_mouse_y = new_mouse_y;
+	int mouse_look;
 
 	mouse_x *= sensitivity.value;
 	mouse_y *= sensitivity.value;
@@ -77,10 +78,14 @@ void IN_Move (usercmd_t *cmd)
 	else
 		cl.viewangles[YAW] -= m_yaw.value * mouse_x;
 
-	if (in_mlook.state & 1)
+	// Hack: We always enable mouse look ("modern" Q3 style).
+	// mouse_look = ((in_mlook.state & 1) != 0);
+	mouse_look = 1;
+
+	if (mouse_look)
 		V_StopPitchDrift ();
 
-	if ((in_mlook.state & 1) && !(in_strafe.state & 1))
+	if (mouse_look && !(in_strafe.state & 1))
 	{
 		cl.viewangles[PITCH] += m_pitch.value * mouse_y;
 		if (cl.viewangles[PITCH] > 80)
