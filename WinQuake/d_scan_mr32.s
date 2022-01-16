@@ -336,21 +336,32 @@ D_DrawZSpans:
     lsr     r13, r9, #1                 ; r13 = doublecount
     bz      r13, 4f
 
-    ; Inner loop (two 1/z values per iteration).
+#ifdef __MRISC32_VECTOR_OPS__
+    ; Inner loop (vectorized).
+    getsr   vl, #0x10
+    mul     r14, r12, vl                ; r14 = izistep * VL
 3:
-    add     r14, r10, r12               ; izi += izistep
+    min     vl, vl, r13
+    sub     r13, r13, vl
+
+    ldea    v1, [r10, r12*2]            ; v1 = izi (even)
+    add     v2, v1, r12                 ; v2 = izi (odd)
 #ifdef __MRISC32_PACKED_OPS__
-    packhi  r11, r14, r10
+    packhi  v1, v2, v1                  ; v1 = (v2 & 0xffff0000 | (v1 >> 16)
 #else
-    shuf    r15, r14, #0b0011010100100  ; r15 = r14 & 0xffff0000
-    lsr     r11, r10, #16
-    or      r11, r15, r11
+    shuf    v3, v2, #0b0011010100100    ; v3 = v1 & 0xffff0000
+    lsr     v4, v1, #16
+    or      v1, v3, v4                  ; v1 = (v2 & 0xffff0000 | (v1 >> 16)
 #endif
-    add     r10, r14, r12               ; izi += izistep
-    add     r13, r13, #-1               ; doublecount--
-    stw     r11, [r8]                   ; *(int*)pdest = (r14 & 0xffff0000 | (r10 >> 16))
-    add     r8, r8, #4                  ; pdest += 2
+    ldea    r10, [r10, r14*2]           ; izi += izistep * VL * 2
+
+    stw     v1, [r8, #4]                ; *(int*)pdest = (v2 & 0xffff0000 | (v1 >> 16))
+    ldea    r8, [r8, vl*4]              ; pdest += 2 * VL
+
     bnz     r13, 3b
+#else
+#error "Support for non-vectorized operation not implemented yet"
+#endif
 
 4:
     ldw     r1, [r1, #espan_t_pnext]    ; pspan = pspan->pnext
@@ -392,6 +403,7 @@ D_DrawTurbulent8Span:
     ldwpc   r7, #r_turb_pbase@pc        ; r7 = r_turb_pbase (unsigned char*)
     ldwpc   r8, #r_turb_pdest@pc        ; r8 = r_turb_pdest (unsigned char*)
 
+#ifdef __MRISC32_VECTOR_OPS__
     getsr   vl, #0x10
     ldea    v1, r1, r3
     ldea    v2, r2, r4
@@ -432,6 +444,9 @@ D_DrawTurbulent8Span:
 
     ; while (--r_turb_spancount > 0)
     bgt     r5, 1b
+#else
+#error "Support for non-vectorized operation not implemented yet"
+#endif
 
     stwpc   r1, #r_turb_s@pc
     stwpc   r2, #r_turb_t@pc
@@ -474,6 +489,7 @@ D_WarpScreenKernel:
 
     mov     r11, r3                 ; r11 = &turb[u]
 
+#ifdef __MRISC32_VECTOR_OPS__
     getsr   vl, #0x10
     mov     r8, r1
 2:
@@ -493,6 +509,9 @@ D_WarpScreenKernel:
     ldea    r9, [r9, vl*4]          ; col++
 
     bgt     r8, 2b
+#else
+#error "Support for non-vectorized operation not implemented yet"
+#endif
 
     add     r10, r10, #4            ; turb++
     add     r4, r4, #4              ; rowptr++
