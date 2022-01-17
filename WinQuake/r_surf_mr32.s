@@ -33,8 +33,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 .macro R_DrawSurfaceBlock8 count, l2count
     ; Get the outer loop counter (and skip to the end if zero).
-    addpchi r10, #r_numvblocks@pchi
-    ldw     r10, [r10, #r_numvblocks+4@pclo] ; r10 = v (= r_numvblocks)
+    ldwpc   r10, #r_numvblocks@pc            ; r10 = v (= r_numvblocks)
     bz      r10, 2$
 
     ; Save callee saved registers.
@@ -42,24 +41,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
     stw     vl, [sp, #0]
 
     ; Pre-load global variables into registers.
-    addpchi r1, #sourcetstep@pchi
-    ldw     r1, [r1, #sourcetstep+4@pclo]    ; r1 = sourcetstep
-    addpchi r2, #surfrowbytes@pchi
-    ldw     r2, [r2, #surfrowbytes+4@pclo]   ; r2 = surfrowbytes
-    addpchi r3, #r_lightwidth@pchi
-    ldw     r3, [r3, #r_lightwidth+4@pclo]   ; r3 = r_lightwidth
-    addpchi r4, #r_sourcemax@pchi
-    ldw     r4, [r4, #r_sourcemax+4@pclo]    ; r4 = r_sourcemax
-    addpchi r5, #r_stepback@pchi
-    ldw     r5, [r5, #r_stepback+4@pclo]     ; r5 = r_stepback
-    addpchi r6, #r_lightptr@pchi
-    ldw     r6, [r6, #r_lightptr+4@pclo]     ; r6 = r_lightptr
-    addpchi r7, #vid+4@pchi
-    ldw     r7, [r7, #vid+4+4@pclo]          ; r7 = vid.colormap (vid+4)
-    addpchi r8, #pbasesource@pchi
-    ldw     r8, [r8, #pbasesource+4@pclo]    ; r8 = pbasesource
-    addpchi r9, #prowdestbase@pchi
-    ldw     r9, [r9, #prowdestbase+4@pclo]   ; r9 = prowdestbase
+    ldwpc   r1, #sourcetstep@pc              ; r1 = sourcetstep
+    ldwpc   r2, #surfrowbytes@pc             ; r2 = surfrowbytes
+    ldwpc   r3, #r_lightwidth@pc             ; r3 = r_lightwidth
+    ldwpc   r4, #r_sourcemax@pc              ; r4 = r_sourcemax
+    ldwpc   r5, #r_stepback@pc               ; r5 = r_stepback
+    ldwpc   r6, #r_lightptr@pc               ; r6 = r_lightptr
+    ldwpc   r7, #vid+4@pc                    ; r7 = vid.colormap (vid+4)
+    ldwpc   r8, #pbasesource@pc              ; r8 = pbasesource
+    ldwpc   r9, #prowdestbase@pc             ; r9 = prowdestbase
 
     ; Set up vector operation.
     ldi     vl, #\count         ; We use the same VL for all iterations.
@@ -102,8 +92,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
     bnz     r10, 1$
 
     ; Store the final value of r_lightptr.
-    addpchi r1, #r_lightptr@pchi
-    stw     r6, [r1, #r_lightptr+4@pclo]
+    stwpc   r6, #r_lightptr@pc
 
     ; Restore callee saved registers.
     ldw     vl, [sp, #0]

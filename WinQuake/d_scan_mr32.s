@@ -58,30 +58,18 @@ D_DrawSpans8:
     stw     r16, [sp, #64]
 
     ; Load hot global variables into registers.
-    addpchi r2, #cacheblock@pchi
-    ldw     r2, [r2, #cacheblock+4@pclo]    ; r2 = pbase (unsigned char *)
-    addpchi r3, #d_viewbuffer@pchi
-    ldw     r3, [r3, #d_viewbuffer+4@pclo]  ; r3 = d_viewbuffer (byte *)
-    addpchi r4, #screenwidth@pchi
-    ldw     r4, [r4, #screenwidth+4@pclo]   ; r4 = screenwidth (int)
-    addpchi r5, #d_sdivzstepu@pchi
-    ldw     r5, [r5, #d_sdivzstepu+4@pclo]  ; r5 = d_sdivzstepu (float)
-    addpchi r6, #d_tdivzstepu@pchi
-    ldw     r6, [r6, #d_tdivzstepu+4@pclo]  ; r6 = d_tdivzstepu (float)
-    addpchi r7, #d_zistepu@pchi
-    ldw     r7, [r7, #d_zistepu+4@pclo]     ; r7 = d_zistepu (float)
-    addpchi r8, #sadjust@pchi
-    ldw     r8, [r8, #sadjust+4@pclo]       ; r8 = sadjust (fixed16_t)
-    addpchi r9, #tadjust@pchi
-    ldw     r9, [r9, #tadjust+4@pclo]       ; r9 = tadjust (fixed16_t)
-    addpchi r10, #bbextents@pchi
-    ldw     r10, [r10, #bbextents+4@pclo]   ; r10 = bbextents (fixed16_t)
-    addpchi r11, #bbextentt@pchi
-    ldw     r11, [r11, #bbextentt+4@pclo]   ; r11 = bbextentt (fixed16_t)
-    addpchi r12, #cachewidth@pchi
-    ldw     r12, [r12, #cachewidth+4@pclo]  ; r12 = cachewidth (int)
-    addpchi r26, #d_sdivzstepv@pchi
-    ldw     r26, [r26, #d_sdivzstepv+4@pclo] ; r26 = d_sdivzstepv (float)
+    ldwpc   r2, #cacheblock@pc              ; r2 = pbase (unsigned char *)
+    ldwpc   r3, #d_viewbuffer@pc            ; r3 = d_viewbuffer (byte *)
+    ldwpc   r4, #screenwidth@pc             ; r4 = screenwidth (int)
+    ldwpc   r5, #d_sdivzstepu@pc            ; r5 = d_sdivzstepu (float)
+    ldwpc   r6, #d_tdivzstepu@pc            ; r6 = d_tdivzstepu (float)
+    ldwpc   r7, #d_zistepu@pc               ; r7 = d_zistepu (float)
+    ldwpc   r8, #sadjust@pc                 ; r8 = sadjust (fixed16_t)
+    ldwpc   r9, #tadjust@pc                 ; r9 = tadjust (fixed16_t)
+    ldwpc   r10, #bbextents@pc              ; r10 = bbextents (fixed16_t)
+    ldwpc   r11, #bbextentt@pc              ; r11 = bbextentt (fixed16_t)
+    ldwpc   r12, #cachewidth@pc             ; r12 = cachewidth (int)
+    ldwpc   r26, #d_sdivzstepv@pc           ; r26 = d_sdivzstepv (float)
 
     ; Pre-calculate 8.0 * x (and store on the stack since we're out of regs).
     ldi     lr, #0x41000000             ; 8.0
@@ -115,24 +103,19 @@ D_DrawSpans8:
     ; NOTE: Schedule instructions to avoid stalls.
     fmul    r20, r14, r5
     fmul    r17, r13, r26
-    addpchi lr, #d_tdivzstepv@pchi
-    ldw     lr, [lr, #d_tdivzstepv+4@pclo]
+    ldwpc   lr, #d_tdivzstepv@pc
     fmul    r21, r14, r6
     fmul    r18, r13, lr
-    addpchi lr, #d_zistepv@pchi
-    ldw     lr, [lr, #d_zistepv+4@pclo]
+    ldwpc   lr, #d_zistepv@pc
     fmul    r22, r14, r7
     fmul    r19, r13, lr
     fadd    r17, r17, r20
     fadd    r18, r18, r21
-    addpchi lr, #d_sdivzorigin@pchi
-    ldw     lr, [lr, #d_sdivzorigin+4@pclo]
+    ldwpc   lr, #d_sdivzorigin@pc
     fadd    r19, r19, r22
     fadd    r17, r17, lr                ; r17 = sdivz (float)
-    addpchi lr, #d_tdivzorigin@pchi
-    ldw     lr, [lr, #d_tdivzorigin+4@pclo]
-    addpchi r20, #d_ziorigin@pchi
-    ldw     r20, [r20, #d_ziorigin+4@pclo]
+    ldwpc   lr, #d_tdivzorigin@pc
+    ldwpc   r20, #d_ziorigin@pc
     fadd    r18, r18, lr                ; r18 = tdivz (float)
     fadd    r19, r19, r20               ; r19 = zi (float)
 
@@ -291,16 +274,11 @@ D_DrawSpans8:
     .type       D_DrawZSpans, @function
 
 D_DrawZSpans:
-    addpchi r2, #d_pzbuffer@pchi
-    ldw     r2, [r2, #d_pzbuffer+4@pclo] ; r2 = d_pzbuffer (short *)
-    addpchi r3, #d_zwidth@pchi
-    ldw     r3, [r3, #d_zwidth+4@pclo]  ; r3 = d_zwidth (unsigned int)
-    addpchi r4, #d_ziorigin@pchi
-    ldw     r4, [r4, #d_ziorigin+4@pclo] ; r4 = d_ziorigin (float)
-    addpchi r5, #d_zistepu@pchi
-    ldw     r5, [r5, #d_zistepu+4@pclo] ; r5 = d_zistepu (float)
-    addpchi r6, #d_zistepv@pchi
-    ldw     r6, [r6, #d_zistepv+4@pclo] ; r6 = d_zistepv (float)
+    ldwpc   r2, #d_pzbuffer@pc          ; r2 = d_pzbuffer (short *)
+    ldwpc   r3, #d_zwidth@pc            ; r3 = d_zwidth (unsigned int)
+    ldwpc   r4, #d_ziorigin@pc          ; r4 = d_ziorigin (float)
+    ldwpc   r5, #d_zistepu@pc           ; r5 = d_zistepu (float)
+    ldwpc   r6, #d_zistepv@pc           ; r6 = d_zistepv (float)
 
     ldi     r7, #31                     ; r7 = 31 (used for ftoi)
     ftoir   r12, r5, r7                 ; r12 = izistep = (int)(d_zistepu * 2^31)
@@ -436,11 +414,11 @@ D_DrawTurbulent8Span:
     stb     v9, [r8, #1]
     add     r8, r8, vl
 
-	; r_turb_s += r_turb_sstep
-	add     v1, v1, r3
+    ; r_turb_s += r_turb_sstep
+    add     v1, v1, r3
 
     ; r_turb_t += r_turb_tstep
-	add     v2, v2, r4
+    add     v2, v2, r4
 
     ; while (--r_turb_spancount > 0)
     bgt     r5, 1b
