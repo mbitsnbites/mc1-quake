@@ -71,6 +71,7 @@ set(SRCS
 
 if(MC1)
   list(APPEND DEFS -DMC1)
+  list(APPEND OPTS -mcmodel=small)
   list(APPEND LIBS
        m
   )
