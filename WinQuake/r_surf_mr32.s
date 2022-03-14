@@ -37,8 +37,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
     bz      r10, 2$
 
     ; Save callee saved registers.
-    add     sp, sp, #-4
-    stw     vl, [sp, #0]
+    stw     vl, [sp, #-4]
 
     ; Pre-load global variables into registers.
     ldwpc   r1, #sourcetstep@pc              ; r1 = sourcetstep
@@ -51,10 +50,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
     ldwpc   r8, #pbasesource@pc              ; r8 = pbasesource
     ldwpc   r9, #prowdestbase@pc             ; r9 = prowdestbase
 
-    ; Set up vector operation.
-    ldi     vl, #\count         ; We use the same VL for all iterations.
-    ldi     r15, #0x0000ff00
-    or      v3, vz, r15         ; v3 = select mask
+    ; Set up vector operation (we use the same VL for all iterations).
+    ldi     vl, #\count
 
     ; Outer loop.
 1$:
@@ -63,9 +60,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
     ldw     r12, [r6, #4]       ; r12 = lightright = r_lightptr[1]
     ldea    r6, [r6, r3 * 4]    ; r_lightptr += r_lightwidth
     ldw     r13, [r6, #0]
+    ldw     r14, [r6, #4]
     sub     r13, r13, r11
     asr     r13, r13, #\l2count ; r13 = lightleftstep = (r_lightptr[0] - lightleft) >> l2count
-    ldw     r14, [r6, #4]
     sub     r14, r14, r12
     asr     r14, r14, #\l2count ; r14 = lightrightstep = (r_lightptr[1] - lightright) >> l2count
 
@@ -73,9 +70,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
     .rept   \count
         sub     r15, r12, r11
         asr     r15, r15, #\l2count ; r15 = lightstep = (lightright - lightleft) >> l2count
-        ldub    v1, [r8, #1]        ; v1 = pbasesource[b]
-        ldea    v2, [r11, r15]      ; v2 = lightleft + lightstep*b
-        sel.231 v1, v3, v2          ; v1 = (v2 & 0xff00) | v1
+        ldub    v2, [r8, #1]        ; v2 = pbasesource[b]
+        ldea    v1, [r11, r15]      ; v1 = lightleft + lightstep*b
+        ibf     v1, v2, #<0:8>      ; v1 = (v1 & 0xffffff00) | v2
         ldub    v1, [r7, v1]        ; v1 = vid.colormap[(v2 & 0xff00) | v1]
         stb     v1, [r9, #1]        ; prowdestbase[b] = v1
         ldea    r8, [r8, r1]        ; pbasesource += sourcetstep
@@ -95,8 +92,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
     stwpc   r6, #r_lightptr@pc
 
     ; Restore callee saved registers.
-    ldw     vl, [sp, #0]
-    add     sp, sp, #4
+    ldw     vl, [sp, #-4]
 
 2$:
     ret
