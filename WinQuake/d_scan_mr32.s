@@ -40,22 +40,20 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 D_DrawSpans8:
     ; Store callee saved registers on the stack.
-    ; Also allocate space on the stack for local variables (register spill).
-    add     sp, sp, #-68
-    stw     lr, [sp, #12]
-    stw     fp, [sp, #16]
-    stw     tp, [sp, #20]
-    stw     r26, [sp, #24]
-    stw     r25, [sp, #28]
-    stw     r24, [sp, #32]
-    stw     r23, [sp, #36]
-    stw     r22, [sp, #40]
-    stw     r21, [sp, #44]
-    stw     r20, [sp, #48]
-    stw     r19, [sp, #52]
-    stw     r18, [sp, #56]
-    stw     r17, [sp, #60]
-    stw     r16, [sp, #64]
+    stw     lr, [sp, #-4]
+    stw     fp, [sp, #-8]
+    stw     tp, [sp, #-12]
+    stw     r26, [sp, #-16]
+    stw     r25, [sp, #-20]
+    stw     r24, [sp, #-24]
+    stw     r23, [sp, #-28]
+    stw     r22, [sp, #-32]
+    stw     r21, [sp, #-36]
+    stw     r20, [sp, #-40]
+    stw     r19, [sp, #-44]
+    stw     r18, [sp, #-48]
+    stw     r17, [sp, #-52]
+    stw     r16, [sp, #-56]
 
     ; Load hot global variables into registers.
     ldwpc   r2, #cacheblock@pc              ; r2 = pbase (unsigned char *)
@@ -76,9 +74,9 @@ D_DrawSpans8:
     fmul    r13, r7, lr
     fmul    r14, r6, lr
     fmul    r15, r5, lr
-    stw     r13, [sp, #0]               ; 8.0 * d_zistepu
-    stw     r14, [sp, #4]               ; 8.0 * d_tdivzstepu
-    stw     r15, [sp, #8]               ; 8.0 * d_sdivzstepu
+    stw     r13, [sp, #-60]             ; 8.0 * d_zistepu
+    stw     r14, [sp, #-64]             ; 8.0 * d_tdivzstepu
+    stw     r15, [sp, #-68]             ; 8.0 * d_sdivzstepu
 
     ; Pre-load constants.
     ldi     tp, #0x47800000             ; tp = 65536.0
@@ -145,9 +143,9 @@ D_DrawSpans8:
 
     ; spancount is 8, so calculate s/z, t/z, zi->fixed s and t at far end of
     ; span, and calculate s and t steps across span by shifting.
-    ldw     r23, [sp, #0]               ; 8.0 * d_zistepu
-    ldw     r24, [sp, #4]               ; 8.0 * d_tdivzstepu
-    ldw     r25, [sp, #8]               ; 8.0 * d_sdivzstepu
+    ldw     r23, [sp, #-60]             ; 8.0 * d_zistepu
+    ldw     r24, [sp, #-64]             ; 8.0 * d_tdivzstepu
+    ldw     r25, [sp, #-68]             ; 8.0 * d_sdivzstepu
     fadd    r19, r19, r23               ; zi += 8.0 * d_zistepu
     fadd    r18, r18, r24               ; tdivz += 8.0 * d_tdivzstepu
     fadd    r17, r17, r25               ; sdivz += 8.0 * d_sdivzstepu
@@ -197,21 +195,20 @@ D_DrawSpans8:
     bnz     r1, 1b                      ; while (pspan != NULL)
 
     ; Restore callee saved registers from the stack.
-    ldw     lr, [sp, #12]
-    ldw     fp, [sp, #16]
-    ldw     tp, [sp, #20]
-    ldw     r26, [sp, #24]
-    ldw     r25, [sp, #28]
-    ldw     r24, [sp, #32]
-    ldw     r23, [sp, #36]
-    ldw     r22, [sp, #40]
-    ldw     r21, [sp, #44]
-    ldw     r20, [sp, #48]
-    ldw     r19, [sp, #52]
-    ldw     r18, [sp, #56]
-    ldw     r17, [sp, #60]
-    ldw     r16, [sp, #64]
-    add     sp, sp, #68
+    ldw     lr, [sp, #-4]
+    ldw     fp, [sp, #-8]
+    ldw     tp, [sp, #-12]
+    ldw     r26, [sp, #-16]
+    ldw     r25, [sp, #-20]
+    ldw     r24, [sp, #-24]
+    ldw     r23, [sp, #-28]
+    ldw     r22, [sp, #-32]
+    ldw     r21, [sp, #-36]
+    ldw     r20, [sp, #-40]
+    ldw     r19, [sp, #-44]
+    ldw     r18, [sp, #-48]
+    ldw     r17, [sp, #-52]
+    ldw     r16, [sp, #-56]
     ret
 
 3:
