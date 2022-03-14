@@ -3,18 +3,27 @@
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 pushd "${SCRIPT_DIR}" > /dev/null
 
-# Enable function profiling?
+EXE_FILE=out/mc1quake
 PROFILE_FILE=""
-PROFILE_ARGS=""
-if [ "$1" == "--profile" ] ; then
-    shift 1
-    PROFILE_FILE=/tmp/mc1quake-sym-$$
-    mrisc32-elf-readelf -sW out/mc1quake | grep FUNC | awk '{print $2,$8}' > "${PROFILE_FILE}"
-    PROFILE_ARGS="-P ${PROFILE_FILE}"
-fi
+SIM_ARGS=""
 
-# Run the Quake binary.
-mr32sim -g -ga 0x40000ae0 -gp 0x400006c4 -gd 8 -gw 320 -gh 180 ${PROFILE_ARGS} "$@" out/mc1quake
+# Collect script arguments.
+while true ; do
+    if [ "$1" == "--profile" ] ; then
+        shift 1
+        PROFILE_FILE=/tmp/mr32sim-sym-$$
+        mrisc32-elf-readelf -sW "${EXE_FILE}" | grep FUNC | awk '{print $2,$8}' > "${PROFILE_FILE}"
+        SIM_ARGS="${SIM_ARGS} -P ${PROFILE_FILE}"
+    elif [ "$1" == "-f" ] ; then
+        shift 1
+        SIM_ARGS="${SIM_ARGS} -f"
+    else
+        break
+    fi
+done
+
+# Run the executable in the simulator.
+mr32sim -g -ga 0x40000ae0 -gp 0x400006c4 -gd 8 -gw 320 -gh 180 ${SIM_ARGS} "${EXE_FILE}" "$@"
 
 # Delete the temporary profiling data.
 if [ -n "${PROFILE_FILE}" ] ; then
