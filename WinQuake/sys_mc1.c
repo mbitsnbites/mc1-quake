@@ -18,7 +18,10 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
-// sys_null.h -- null system driver to aid porting efforts
+
+#ifdef MC1_SDK
+#include <mc1/newlib_integ.h>
+#endif
 
 #include "quakedef.h"
 #include "errno.h"
@@ -367,6 +370,10 @@ void main (int argc, char **argv)
 	static quakeparms_t parms;
 	double oldtime, newtime;
 	float time;
+
+#ifdef MC1_SDK
+	mc1newlib_init(MC1NEWLIB_ALL & ~MC1NEWLIB_CONSOLE);
+#endif
 
 	parms.memsize = 8 * 1024 * 1024;
 	parms.membase = malloc (parms.memsize);

@@ -106,7 +106,7 @@ static void VID_CreateVCP (void)
 	// Get the native video signal resolution and calculate the scaling factors.
 	unsigned native_width = GET_MMIO (VIDWIDTH);
 	unsigned native_height = GET_MMIO (VIDHEIGHT);
-	unsigned xincr = ((native_width - 1) << 16) / (BASEWIDTH - 1);
+	unsigned xincr = ((BASEWIDTH - 1) << 16) / (native_width - 1);
 	unsigned yincr = ((native_height - 1) << 16) / (BASEHEIGHT - 1);
 
 	// Frame configuraiton.
@@ -138,10 +138,10 @@ static void VID_CreateVCP (void)
 	*palette = VCP_RTS;
 
 	// Configure the main layer 1 VCP to call our VCP.
-	*((unsigned *)0x40000008) = VCP_JMP (s_vcp);
+	*((unsigned *)0x40000010) = VCP_JMP (s_vcp);
 
 	// The layer 2 VCP should do nothing.
-	*((unsigned *)0x40000010) = VCP_WAITY (32767);
+	*((unsigned *)0x40000020) = VCP_WAITY (32767);
 }
 
 void VID_SetPalette (unsigned char *palette)
@@ -197,9 +197,6 @@ void VID_Init (unsigned char *palette)
 	if (MC1_IsVRAMPtr (s_surfcache))
 		Con_Printf ("Using VRAM for the surface cache\n");
 
-	// Create the VCP.
-	VID_CreateVCP ();
-
 	printf (
 		"VID_Init: Resolution = %d x %d\n"
 		"          Framebuffer @ 0x%08x (%d)\n"
@@ -210,6 +207,9 @@ void VID_Init (unsigned char *palette)
 		(unsigned)s_framebuffer,
 		(unsigned)(s_palette + 4),
 		(unsigned)(s_palette + 4));
+
+	// Create the VCP.
+	VID_CreateVCP ();
 
 	// Set up the vid structure that is used by the Quake rendering engine.
 	vid.maxwarpwidth = vid.width = vid.conwidth = BASEWIDTH;
