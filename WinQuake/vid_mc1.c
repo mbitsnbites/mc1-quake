@@ -34,6 +34,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define BASEWIDTH 320
 #define BASEHEIGHT ((BASEWIDTH * 9 + 8) / 16)
 
+// Memory config.
+#define SURFCACHE_SIZE_MB 8
+
 // Video buffers.
 static byte *s_vcp;
 static byte *s_palette;
@@ -186,7 +189,7 @@ void VID_Init (unsigned char *palette)
 	// Allocate memory for the various buffers that Quake needs.
 	const size_t vbuffer_size = BASEWIDTH * BASEHEIGHT * sizeof (byte);
 	const size_t zbuffer_size = BASEWIDTH * BASEHEIGHT * sizeof (short);
-	const size_t surfcache_size = 4 * 1024 * 1024 * sizeof (byte);
+	const size_t surfcache_size = SURFCACHE_SIZE_MB * 1024 * 1024 * sizeof (byte);
 	s_vbuffer = MC1_Alloc (vbuffer_size);
 	if (MC1_IsVRAMPtr (s_vbuffer))
 		Con_Printf ("Using VRAM for the pixel buffer\n");

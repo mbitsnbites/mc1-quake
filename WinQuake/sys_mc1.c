@@ -30,6 +30,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdint.h>
 #include <sys/time.h>
 
+// Memory config.
+#define HEAP_SIZE_MB 16
+
 qboolean isDedicated;
 
 static int Sys_TranslateKey (unsigned keycode)
@@ -375,7 +378,7 @@ void main (int argc, char **argv)
 	mc1newlib_init(MC1NEWLIB_ALL & ~MC1NEWLIB_CONSOLE);
 #endif
 
-	parms.memsize = 8 * 1024 * 1024;
+	parms.memsize = HEAP_SIZE_MB * 1024 * 1024;
 	parms.membase = malloc (parms.memsize);
 	parms.basedir = ".";
 
