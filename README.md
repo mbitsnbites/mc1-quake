@@ -1,8 +1,8 @@
 # MC1-Quake
 
-This is the classic game Quake (by id Software) ported to the
-[MRISC32](https://mrisc32.bitsnbites.eu/)-based computer
-[MC1](https://github.com/mrisc32/mc1).
+This is the classic game Quake (by id Software) ported to the [MRISC32](https://mrisc32.bitsnbites.eu/)-based computer [MC1](https://github.com/mrisc32/mc1).
+
+![mc1-quake](mc1-quake-400x364.jpg)
 
 ## Origins & License
 
