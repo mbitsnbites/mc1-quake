@@ -1,3 +1,5 @@
+## This repo has moved to: https://gitlab.com/mbitsnbites/mc1-quake
+
 # MC1-Quake
 
 This is the classic game Quake (by id Software) ported to the [MRISC32](https://mrisc32.bitsnbites.eu/)-based computer [MC1](https://github.com/mrisc32/mc1).
